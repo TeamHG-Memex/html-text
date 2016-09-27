@@ -25,7 +25,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author="Konstantin Lopukhin",
     author_email='kostia.lopuhin@gmail.com',
-    url='https://github.com/TeamHG-Memex/html_text',
+    url='https://github.com/TeamHG-Memex/html-text',
     packages=['html_text'],
     include_package_data=True,
     install_requires=requirements,

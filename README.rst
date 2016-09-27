@@ -3,11 +3,11 @@ HTML to Text
 ============
 
 
-.. image:: https://img.shields.io/pypi/v/html_text.svg
-        :target: https://pypi.python.org/pypi/html_text
+.. image:: https://img.shields.io/pypi/v/html-text.svg
+        :target: https://pypi.python.org/pypi/html-text
 
-.. image:: https://img.shields.io/travis/TeamHG-Memex/html_text.svg
-        :target: https://travis-ci.org/TeamHG-Memex/html_text
+.. image:: https://img.shields.io/travis/TeamHG-Memex/html-text.svg
+        :target: https://travis-ci.org/TeamHG-Memex/html-text
 
 
 Extract text from HTML
