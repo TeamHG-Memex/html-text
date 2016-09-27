@@ -9,20 +9,26 @@ HTML to Text
 .. image:: https://img.shields.io/travis/TeamHG-Memex/html_text.svg
         :target: https://travis-ci.org/TeamHG-Memex/html_text
 
-.. image:: https://readthedocs.org/projects/html-text/badge/?version=latest
-        :target: https://html-text.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
 
 Extract text from HTML
 
 
 * Free software: MIT license
-* Documentation: https://html-text.readthedocs.io.
 
 
-Features
---------
+Install
+-------
+
+Install with pip::
+
+    pip install html-text
+
+The package depends on lxml, so you might need to install some additional
+packages: http://lxml.de/installation.html
+
+
+Usage
+-----
 
 Extract text from HTML::
 
