@@ -21,6 +21,12 @@ Extract text from HTML
 * Free software: MIT license
 
 
+How is html_text different from ``.xpath('//text()')`` from LXML
+or ``.get_text()`` from Beautiful Soup?
+Text extracted with ``html_text`` does not contain inline styles,
+javascript, comments and other text that is not normally visible to the users.
+
+
 Install
 -------
 
