@@ -24,16 +24,30 @@ _clean_html = Cleaner(
 
 
 def _cleaned_html_tree(html):
-    parser = lxml.html.HTMLParser(encoding='utf8')
-    tree = lxml.html.fromstring(html.encode('utf8'), parser=parser)
+    if isinstance(html, lxml.html.HtmlElement):
+        tree = html
+    else:
+        parser = lxml.html.HTMLParser(encoding='utf8')
+        tree = lxml.html.fromstring(html.encode('utf8'), parser=parser)
     return _clean_html(tree)
 
 
+def parse_html(html):
+    """ Create an lxml.html.HtmlElement from a string with html.
+    """
+    parser = lxml.html.HTMLParser(encoding='utf8')
+    return lxml.html.fromstring(html.encode('utf8'), parser=parser)
+
+
 def selector_to_text(sel):
+    """ Convert a cleaned selector to text.
+    """
     return sel.xpath('normalize-space()').extract_first('')
 
 
 def cleaned_selector(html):
+    """ Clean selector.
+    """
     try:
         tree = _cleaned_html_tree(html)
         sel = parsel.Selector(root=tree, type='html')
@@ -46,9 +60,10 @@ def cleaned_selector(html):
     return sel
 
 
-def extract_text(html):
+def extract_text(html, encoding='utf8'):
     """
     Convert html to text.
 
+    html should be a unicode string or an already parsed lxml.html element.
     """
     return selector_to_text(cleaned_selector(html))

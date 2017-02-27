@@ -47,6 +47,13 @@ Extract text from HTML::
     >>> text = html_text.extract_text(u'<h1>Hey</h1>')
     u'Hey'
 
+You can also pass already parsed ``lxml.html.HtmlElement``:
+
+    >>> import html_text
+    >>> tree = html_text.parse_html(u'<h1>Hey</h1>')
+    >>> text = html_text.extract_text(tree)
+    u'Hey'
+
 
 Credits
 -------

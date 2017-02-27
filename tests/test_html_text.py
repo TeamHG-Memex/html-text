@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from html_text import extract_text
+from html_text import extract_text, parse_html
 
 
 def test_extract_text():
@@ -18,3 +18,8 @@ def test_declared_encoding():
 def test_empty():
     assert extract_text(u'') == ''
 
+
+def test_extract_text_from_tree():
+    html = u'<html><style>.div {}</style><body><p>Hello,   world!</body></html>'
+    tree = parse_html(html)
+    assert extract_text(tree) == u'Hello, world!'
