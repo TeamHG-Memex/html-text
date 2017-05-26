@@ -23,3 +23,8 @@ def test_extract_text_from_tree():
     html = u'<html><style>.div {}</style><body><p>Hello,   world!</body></html>'
     tree = parse_html(html)
     assert extract_text(tree) == u'Hello, world!'
+
+
+def test_inline_tags_whitespace():
+    html = u'<span>field</span><span>value</span>'
+    assert extract_text(html) == u'field value'

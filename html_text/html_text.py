@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+
 import lxml
 import lxml.etree
 from lxml.html.clean import Cleaner
@@ -41,8 +43,13 @@ def parse_html(html):
 
 def selector_to_text(sel):
     """ Convert a cleaned selector to text.
+    Almost the same as xpath normalize-space, but this also
+    adds spaces between inline elements (like <span>) which are
+    often used as block elements in html markup.
     """
-    return sel.xpath('normalize-space()').extract_first('')
+    fragments = (re.sub('\s+', ' ', x.strip())
+                 for x in sel.xpath('//text()').extract())
+    return ' '.join(x for x in fragments if x)
 
 
 def cleaned_selector(html):
