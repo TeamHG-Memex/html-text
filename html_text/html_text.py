@@ -41,13 +41,16 @@ def parse_html(html):
     return lxml.html.fromstring(html.encode('utf8'), parser=parser)
 
 
+_whitespace = re.compile('\s+')
+
+
 def selector_to_text(sel):
     """ Convert a cleaned selector to text.
     Almost the same as xpath normalize-space, but this also
     adds spaces between inline elements (like <span>) which are
     often used as block elements in html markup.
     """
-    fragments = (re.sub('\s+', ' ', x.strip())
+    fragments = (_whitespace.sub(' ', x.strip())
                  for x in sel.xpath('//text()').extract())
     return ' '.join(x for x in fragments if x)
 
