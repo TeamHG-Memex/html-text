@@ -26,6 +26,14 @@ or ``.get_text()`` from Beautiful Soup?
 Text extracted with ``html_text`` does not contain inline styles,
 javascript, comments and other text that is not normally visible to the users.
 
+Apart from just getting text from the page (e.g. for display or search),
+one intended usage of this library is for machine learning (feature extraction).
+If you want to use the text of the html page as a feature (e.g. for classification),
+this library gives you plain text that you can later feed into a standard text
+classification pipeline.
+If you feel that you need html structure as well, check out
+`webstruct <http://webstruct.readthedocs.io/en/latest/>`_ library.
+
 
 Install
 -------
