@@ -25,6 +25,10 @@ How is html_text different from ``.xpath('//text()')`` from LXML
 or ``.get_text()`` from Beautiful Soup?
 Text extracted with ``html_text`` does not contain inline styles,
 javascript, comments and other text that is not normally visible to the users.
+It normalizes whitespace, but is also smarter than ``.xpath('normalize-space())``,
+adding spaces around inline elements too
+(which are often used as block elements in html markup),
+and tries to avoid adding extra spaces for punctuation.
 
 Apart from just getting text from the page (e.g. for display or search),
 one intended usage of this library is for machine learning (feature extraction).
