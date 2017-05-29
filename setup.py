@@ -6,7 +6,7 @@ from setuptools import setup
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
+with open('CHANGES.rst') as history_file:
     history = history_file.read()
 
 requirements = [
@@ -20,7 +20,7 @@ test_requirements = [
 
 setup(
     name='html_text',
-    version='0.1.1',
+    version='0.2.0',
     description="Extract text from HTML",
     long_description=readme + '\n\n' + history,
     author="Konstantin Lopukhin",
