@@ -47,11 +47,9 @@ _has_punct_after = re.compile(r'^[,:;.!?"\)]').search
 _has_punct_before = re.compile(r'\($').search
 
 
-def selector_to_text(sel, guess_punct_space=False):
+def selector_to_text(sel, guess_punct_space=True):
     """ Convert a cleaned selector to text.
-    Almost the same as xpath normalize-space, but this also
-    adds spaces between inline elements (like <span>) which are
-    often used as block elements in html markup.
+    See html_text.extract_text docstring for description of the approach and options.
     """
     if guess_punct_space:
 
@@ -87,9 +85,16 @@ def cleaned_selector(html):
     return sel
 
 
-def extract_text(html, guess_punct_space=False):
+def extract_text(html, guess_punct_space=True):
     """
     Convert html to text.
+    Almost the same as normalize-space xpath, but this also
+    adds spaces between inline elements (like <span>) which are
+    often used as block elements in html markup.
+
+    When guess_punct_space is True (default), no extra whitespace is added
+    for punctuation. This has a slight (around 10%) performance overhead
+    and is just a heuristic.
 
     html should be a unicode string or an already parsed lxml.html element.
     """

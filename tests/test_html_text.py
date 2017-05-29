@@ -39,7 +39,7 @@ def test_inline_tags_whitespace(all_options):
 
 def test_punct_whitespace():
     html = u'<div><span>field</span>, and more</div>'
-    assert extract_text(html) == u'field , and more'
+    assert extract_text(html, guess_punct_space=False) == u'field , and more'
 
 
 def test_punct_whitespace_preserved():
