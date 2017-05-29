@@ -68,9 +68,8 @@ def selector_to_text(sel, guess_punct_space=False):
         return _whitespace.sub(' ', ''.join(fragments()).strip())
 
     else:
-        fragments = (_whitespace.sub(' ', x.strip())
-                     for x in sel.xpath('//text()').extract())
-        return ' '.join(x for x in fragments if x)
+        fragments = (x.strip() for x in sel.xpath('//text()').extract())
+        return _whitespace.sub(' ', ' '.join(x for x in fragments if x))
 
 
 def cleaned_selector(html):
