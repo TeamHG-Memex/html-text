@@ -42,9 +42,9 @@ def parse_html(html):
 
 
 _whitespace = re.compile(r'\s+')
-_trailing_whitespace = re.compile(r'\s$')
-_punct_after = re.compile(r'^[,:;.!?"\)]')
-_punct_before = re.compile(r'\($')
+_has_trailing_whitespace = re.compile(r'\s$').search
+_has_punct_after = re.compile(r'^[,:;.!?"\)]').search
+_has_punct_before = re.compile(r'\($').search
 
 
 def selector_to_text(sel, guess_punct_space=False):
@@ -58,9 +58,9 @@ def selector_to_text(sel, guess_punct_space=False):
         def fragments():
             prev = None
             for text in sel.xpath('//text()').extract():
-                if prev is not None and (_trailing_whitespace.search(prev)
-                                         or (not _punct_after.search(text) and
-                                             not _punct_before.search(prev))):
+                if prev is not None and (_has_trailing_whitespace(prev)
+                                         or (not _has_punct_after(text) and
+                                             not _has_punct_before(prev))):
                     yield ' '
                 yield text
                 prev = text
