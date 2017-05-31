@@ -55,7 +55,7 @@ def selector_to_text(sel, guess_punct_space=True):
 
         def fragments():
             prev = None
-            for text in sel.xpath('//text()').extract():
+            for text in sel.xpath('.//text()').extract():
                 if prev is not None and (_has_trailing_whitespace(prev)
                                          or (not _has_punct_after(text) and
                                              not _has_punct_before(prev))):
@@ -66,7 +66,7 @@ def selector_to_text(sel, guess_punct_space=True):
         return _whitespace.sub(' ', ''.join(fragments()).strip())
 
     else:
-        fragments = (x.strip() for x in sel.xpath('//text()').extract())
+        fragments = (x.strip() for x in sel.xpath('.//text()').extract())
         return _whitespace.sub(' ', ' '.join(x for x in fragments if x))
 
 
@@ -87,7 +87,7 @@ def cleaned_selector(html):
 
 def extract_text(html, guess_punct_space=True):
     """
-    Convert html to text.
+    Convert html to text, cleaning invisible content such as styles.
     Almost the same as normalize-space xpath, but this also
     adds spaces between inline elements (like <span>) which are
     often used as block elements in html markup.
