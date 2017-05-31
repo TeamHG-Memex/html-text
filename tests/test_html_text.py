@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from html_text import extract_text, parse_html
+from html_text import extract_text, parse_html, cleaned_selector, selector_to_text
 
 
 @pytest.fixture(params=[{'guess_punct_space': True},
@@ -47,3 +47,11 @@ def test_punct_whitespace_preserved():
             u'<span>more </span>!<span>now</div>a (<b>boo</b>)')
     assert (extract_text(html, guess_punct_space=True) ==
             u'по ле, and , more ! now a (boo)')
+
+
+def test_selector(all_options):
+    html = '<div><div id="extract-me">text<div>more</div></div>and more text</div>'
+    sel = cleaned_selector(html)
+    assert selector_to_text(sel, **all_options) == 'text more and more text'
+    subsel = sel.xpath('//div[@id="extract-me"]')[0]
+    assert selector_to_text(subsel, **all_options) == 'text more'

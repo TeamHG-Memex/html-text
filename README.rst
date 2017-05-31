@@ -66,6 +66,16 @@ You can also pass already parsed ``lxml.html.HtmlElement``:
     >>> text = html_text.extract_text(tree)
     u'Hey'
 
+Passed html will be first cleaned from invisible non-text content such
+as styles, and then text would be extracted.
+Two functions that do it are ``html_text.cleaned_selector`` and
+``html_text.selector_to_text``:
+
+* ``html_text.cleaned_selector`` accepts html as text or as ``lxml.html.HtmlElement``,
+  and returns cleaned ``parsel.Selector``.
+* ``html_text.selector_to_text`` accepts ``parsel.Selector`` and returns extracted
+  text.
+
 
 Credits
 -------
