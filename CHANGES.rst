@@ -2,6 +2,13 @@
 History
 =======
 
+0.3.0 (2017-10-12)
+------------------
+
+* Expose functions that operate on selectors,
+  use ``.//text()`` to extract text from selector.
+
+
 0.2.1 (2017-05-29)
 ------------------
 
