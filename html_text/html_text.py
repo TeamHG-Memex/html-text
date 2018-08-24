@@ -6,7 +6,6 @@ import lxml.etree
 from lxml.html.clean import Cleaner
 import parsel
 
-
 _clean_html = Cleaner(
     scripts=True,
     javascript=False,  # onclick attributes are fine
@@ -69,6 +68,59 @@ def selector_to_text(sel, guess_punct_space=True):
         fragments = (x.strip() for x in sel.xpath('.//text()').extract())
         return _whitespace.sub(' ', ' '.join(x for x in fragments if x))
 
+def selector_to_text_new(tree, guess_punct_space=True, guess_page_layout=False):
+    """ Convert a cleaned selector to text.
+    See html_text.extract_text docstring for description of the approach and options.
+    """
+
+    if guess_punct_space:
+        def add_newline(tag):
+            if tag in ['title', 'p', 'h1', 'li', 'dd', 'dt', 'dl']:
+                return '\n'
+            return ''
+
+        def traverse_text_fragments(tree, prev):
+            space = ''
+            newline = ''
+            if tree.text:
+                text = _whitespace.sub(' ', tree.text.strip())
+                if text:
+                    if prev[0] is not None and (not _has_trailing_whitespace(prev[0])
+                                        and (not _has_punct_after(tree.text) and
+                                            not _has_punct_before(prev[0]))):
+                        space = ' '
+                    if guess_page_layout:
+                        newline = add_newline(tree.tag)
+                    yield [space, text, newline]
+                    prev[0] = (newline or text)
+                    space = ''
+                    newline = ''
+
+            for child in tree:  # where is my precious "yield from"?
+                for t in traverse_text_fragments(child, prev):
+                    yield t
+
+            if tree.tail:
+                text = _whitespace.sub(' ', tree.tail.strip())
+                if text:
+                    if prev[0] is not None and (not _has_trailing_whitespace(prev[0])
+                                        and (not _has_punct_after(tree.tail) and
+                                            not _has_punct_before(prev[0]))):
+                        space = ' '
+                    if guess_page_layout:
+                        newline = add_newline(tree.tag)
+                    yield [space, text, newline]
+                    prev[0] = (newline or text)
+        
+        text = []
+        for fragment in traverse_text_fragments(tree, [None]):
+            text.extend(fragment)
+        return ''.join(text).strip()
+
+    else:
+        # fragments = (x.strip() for x in sel.xpath('.//text()').extract())
+        # return _whitespace.sub(' ', ' '.join(x for x in fragments if x))
+        pass
 
 def cleaned_selector(html):
     """ Clean selector.
@@ -85,7 +137,7 @@ def cleaned_selector(html):
     return sel
 
 
-def extract_text(html, guess_punct_space=True):
+def extract_text(html, guess_punct_space=True, guess_page_layout=False):
     """
     Convert html to text, cleaning invisible content such as styles.
     Almost the same as normalize-space xpath, but this also
@@ -98,5 +150,27 @@ def extract_text(html, guess_punct_space=True):
 
     html should be a unicode string or an already parsed lxml.html element.
     """
+    # from time import time
+
+    
+    cleaned = _clean_html(html)
+    # t1 = time()
+    res = selector_to_text_new(cleaned, guess_page_layout=guess_page_layout)
+    # t2 = time()
+    # print('NEW')
+    # print('clean_time: ', t1 - t0)
+    # print('text_time: ', t2 - t1)
+    # print('total_time: ', t2 - t0)
+    # else:
+    #     # t0 = time()
     sel = cleaned_selector(html)
-    return selector_to_text(sel, guess_punct_space=guess_punct_space)
+    # t1 = time()
+    old = selector_to_text(sel, guess_punct_space=guess_punct_space)
+    # t2 = time()
+    # print('OLD')
+    # print('clean_time: ', t1 - t0)
+    # print('text_time: ', t2 - t1)
+    # print('total_time: ', t2 - t0)
+    # print('')
+    # t0 = time()
+    return res, old
