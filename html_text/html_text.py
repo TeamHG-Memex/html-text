@@ -74,43 +74,42 @@ def selector_to_text_new(tree, guess_punct_space=True, guess_page_layout=False):
     """
 
     if guess_punct_space:
-        def add_newline(tag):
-            if tag in ['title', 'p', 'h1', 'li', 'dd', 'dt', 'dl']:
-                return '\n'
-            return ''
 
         def traverse_text_fragments(tree, prev):
             space = ''
-            newline = ''
             if tree.text:
                 text = _whitespace.sub(' ', tree.text.strip())
                 if text:
                     if prev[0] is not None and (not _has_trailing_whitespace(prev[0])
                                         and (not _has_punct_after(tree.text) and
-                                            not _has_punct_before(prev[0]))):
+                                             not _has_punct_before(prev[0]))):
                         space = ' '
-                    if guess_page_layout:
-                        newline = add_newline(tree.tag)
-                    yield [space, text, newline]
-                    prev[0] = (newline or text)
+                    
+                    yield [space, text]
+                    prev[0] = text
                     space = ''
-                    newline = ''
 
             for child in tree:  # where is my precious "yield from"?
                 for t in traverse_text_fragments(child, prev):
                     yield t
+            
+            tail_text = []
+            if guess_page_layout and tree.tag in ['title', 'p', 'h1', 'li', 'dd', 'dt', 'dl']:
+                tail_text.append('\n')
+                prev[0] = '\n'
 
             if tree.tail:
                 text = _whitespace.sub(' ', tree.tail.strip())
                 if text:
-                    if prev[0] is not None and (not _has_trailing_whitespace(prev[0])
-                                        and (not _has_punct_after(tree.tail) and
-                                            not _has_punct_before(prev[0]))):
-                        space = ' '
-                    if guess_page_layout:
-                        newline = add_newline(tree.tag)
-                    yield [space, text, newline]
-                    prev[0] = (newline or text)
+                    if (not tail_text and prev[0] is not None and 
+                        not _has_trailing_whitespace(prev[0]) and 
+                        not _has_punct_after(tree.tail) and
+                        not _has_punct_before(prev[0])):
+                        tail_text.append(' ')
+                    tail_text.append(text)
+                    prev[0] = text
+            if tail_text:
+                yield tail_text
         
         text = []
         for fragment in traverse_text_fragments(tree, [None]):
@@ -137,7 +136,7 @@ def cleaned_selector(html):
     return sel
 
 
-def extract_text(html, guess_punct_space=True, guess_page_layout=False):
+def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True):
     """
     Convert html to text, cleaning invisible content such as styles.
     Almost the same as normalize-space xpath, but this also
@@ -152,20 +151,21 @@ def extract_text(html, guess_punct_space=True, guess_page_layout=False):
     """
     # from time import time
 
-    
-    cleaned = _clean_html(html)
-    # t1 = time()
-    res = selector_to_text_new(cleaned, guess_page_layout=guess_page_layout)
-    # t2 = time()
-    # print('NEW')
-    # print('clean_time: ', t1 - t0)
-    # print('text_time: ', t2 - t1)
-    # print('total_time: ', t2 - t0)
-    # else:
-    #     # t0 = time()
-    sel = cleaned_selector(html)
-    # t1 = time()
-    old = selector_to_text(sel, guess_punct_space=guess_punct_space)
+    if new:
+        cleaned = _clean_html(html)
+        # t1 = time()
+        res = selector_to_text_new(cleaned, guess_page_layout=guess_page_layout)
+        # t2 = time()
+        # print('NEW')
+        # print('clean_time: ', t1 - t0)
+        # print('text_time: ', t2 - t1)
+        # print('total_time: ', t2 - t0)
+        # else:
+        #     # t0 = time()
+    else:
+        sel = cleaned_selector(html)
+        # t1 = time()
+        res = selector_to_text(sel, guess_punct_space=guess_punct_space)
     # t2 = time()
     # print('OLD')
     # print('clean_time: ', t1 - t0)
@@ -173,4 +173,4 @@ def extract_text(html, guess_punct_space=True, guess_page_layout=False):
     # print('total_time: ', t2 - t0)
     # print('')
     # t0 = time()
-    return res, old
+    return res
