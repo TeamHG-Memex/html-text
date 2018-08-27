@@ -94,7 +94,9 @@ def selector_to_text_new(tree, guess_punct_space=True, guess_page_layout=False):
                     yield t
             
             tail_text = []
-            if guess_page_layout and tree.tag in ['title', 'p', 'h1', 'li', 'dd', 'dt', 'dl']:
+            if (guess_page_layout 
+                and tree.tag in ['title', 'p', 'h1', 'li', 'dd', 'dt', 'dl']
+                and prev[0] != '\n'):
                 tail_text.append('\n')
                 prev[0] = '\n'
 
