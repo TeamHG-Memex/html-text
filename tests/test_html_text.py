@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from html_text import extract_text, parse_html, cleaned_selector, selector_to_text
+from html_text import extract_text, html_to_text, parse_html
 
 
 @pytest.fixture(params=[{'guess_punct_space': True},
-                        {'guess_punct_space': False}])
+                        {'guess_punct_space': False},
+                        {'guess_punct_space': True, 'guess_page_layout': True},
+                        {'guess_punct_space': False, 'guess_page_layout': True}
+                        ])
+
 def all_options(request):
     return request.param
 
@@ -49,9 +53,27 @@ def test_punct_whitespace_preserved():
             u'по ле, and , more ! now a (boo)')
 
 
-def test_selector(all_options):
-    html = '<div><div id="extract-me">text<div>more</div></div>and more text</div>'
-    sel = cleaned_selector(html)
-    assert selector_to_text(sel, **all_options) == 'text more and more text'
-    subsel = sel.xpath('//div[@id="extract-me"]')[0]
-    assert selector_to_text(subsel, **all_options) == 'text more'
+# def test_selector(all_options):
+#     html = '<div><div id="extract-me">text<div>more</div></div>and more text</div>'
+#     sel = cleaned_selector(html)
+#     assert selector_to_text(sel, **all_options) == 'text more and more text'
+#     subsel = sel.xpath('//div[@id="extract-me"]')[0]
+#     assert selector_to_text(subsel, **all_options) == 'text more'
+
+def test_guess_page_layout():
+    html = (u'<title>title</title><div>text_1.<p>text_2 text_3</p><ul>'
+           '<li>text_4</li><li>text_5</li></ul><p>text_6<em>text_7</em>'
+           'text_8</p>text_9</div><p>...text_10</p>'
+           )
+    assert (extract_text(html, guess_punct_space=False) ==
+                                        ('titletext_1.text_2 text_3text_4text_5'
+                                        'text_6text_7text_8text_9...text_10'))
+    assert (extract_text(html, guess_punct_space=False, guess_page_layout=True) ==
+                                ('title\ntext_1.text_2 text_3\ntext_4\ntext_5'
+                                '\ntext_6text_7text_8\ntext_9...text_10'))
+    assert (extract_text(html, guess_punct_space=True) ==
+                                    ('title text_1. text_2 text_3 text_4 text_5'
+                                    ' text_6 text_7 text_8 text_9...text_10'))
+    assert (extract_text(html, guess_punct_space=True, guess_page_layout=True) ==
+                                  ('title\ntext_1. text_2 text_3\ntext_4\ntext_5'
+                                  '\ntext_6 text_7 text_8\ntext_9...text_10'))
