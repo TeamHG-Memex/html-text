@@ -5,6 +5,10 @@ import lxml
 import lxml.etree
 from lxml.html.clean import Cleaner
 
+
+NEWLINE_TAGS = ['title', 'p', 'li', 'dd', 'dt', 'dl', 'ul',
+                'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+
 _clean_html = Cleaner(
     scripts=True,
     javascript=False,  # onclick attributes are fine
@@ -51,7 +55,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
         and options.
     """
 
-    def should_add_space(text, prev):
+    def add_space(text, prev):
         return (prev is not None
                 and (not _has_trailing_whitespace(prev)
                      and (not _has_punct_after(text)
@@ -60,28 +64,29 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
                      )
                 )
 
+    def add_newline(tag, prev):
+        return tag in NEWLINE_TAGS and prev != '\n'
+
     def traverse_text_fragments(tree, prev):
         space = ''
         if tree.text:
             if guess_punct_space:
                 text = _whitespace.sub(' ', tree.text.strip())
-                if text and should_add_space(text, prev[0]):
+                if text and add_space(text, prev[0]):
                     space = ' '
                 yield [space, text]
                 prev[0] = text
                 space = ''
             else:
-                yield[tree.text]
+                yield [tree.text]
+                prev[0] = tree.text
 
         for child in tree:
             for t in traverse_text_fragments(child, prev):
                 yield t
 
         tail_text = []
-        if (guess_page_layout
-            and tree.tag in ['title', 'p', 'h1', 'li', 'dd', 'dt', 'dl']
-            and prev[0] != '\n'
-            ):
+        if guess_page_layout and add_newline(tree.tag, prev[0]):
             tail_text.append('\n')
             prev[0] = '\n'
 
@@ -90,13 +95,14 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
                 text = _whitespace.sub(' ', tree.tail.strip())
                 if text:
                     if (not tail_text # do not add space after newline
-                        and should_add_space(text, prev[0])):
+                        and add_space(text, prev[0])):
                         tail_text.append(' ')
 
                     tail_text.append(text)
                     prev[0] = text
             else:
                 tail_text.append(tree.tail)
+                prev[0] = tree.tail
         if tail_text:
             yield tail_text
 
@@ -120,7 +126,7 @@ def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True
 
     html should be a unicode string or an already parsed lxml.html element.
     """
-    if not html:
+    if html is None or len(html) == 0:
         return ''
     cleaned = _cleaned_html_tree(html)
     return html_to_text(cleaned, guess_punct_space=guess_punct_space, guess_page_layout=guess_page_layout)
