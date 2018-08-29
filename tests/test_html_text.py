@@ -53,13 +53,6 @@ def test_punct_whitespace_preserved():
             u'по ле, and , more ! now a (boo)')
 
 
-# def test_selector(all_options):
-#     html = '<div><div id="extract-me">text<div>more</div></div>and more text</div>'
-#     sel = cleaned_selector(html)
-#     assert selector_to_text(sel, **all_options) == 'text more and more text'
-#     subsel = sel.xpath('//div[@id="extract-me"]')[0]
-#     assert selector_to_text(subsel, **all_options) == 'text more'
-
 def test_guess_page_layout():
     html = (u'<title>title</title><div>text_1.<p>text_2 text_3</p><ul>'
            '<li>text_4</li><li>text_5</li></ul><p>text_6<em>text_7</em>'
