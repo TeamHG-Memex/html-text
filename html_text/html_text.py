@@ -50,22 +50,21 @@ _has_open_bracket_before = re.compile(r'\($').search
 
 
 def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
-    """ Convert a cleaned html tree to text.
-        See html_text.extract_text docstring for description of the approach
-        and options.
+    """
+    Convert a cleaned html tree to text.
+    See html_text.extract_text docstring for description of the approach
+    and options.
     """
 
     def add_space(text, prev):
-        # return True if a space should be added
+        if prev is None:
+            return False
         if prev == '\n':
             return False
-        return (prev is not None
-                and (_has_trailing_whitespace(prev)
-                     or (not _has_punct_after(text)
-                     and not _has_open_bracket_before(prev)
-                          )
-                     )
-                )
+        if not _has_trailing_whitespace(prev):
+            if _has_punct_after(text) or _has_open_bracket_before(prev):
+                return False
+        return True
 
     def add_newline(tag, prev):
         return tag in NEWLINE_TAGS and prev != '\n'
