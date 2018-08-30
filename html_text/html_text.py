@@ -46,7 +46,7 @@ def parse_html(html):
 _whitespace = re.compile(r'\s+')
 _has_trailing_whitespace = re.compile(r'\s$').search
 _has_punct_after = re.compile(r'^[,:;.!?"\)]').search
-_has_punct_before = re.compile(r'\($').search
+_has_open_bracket_before = re.compile(r'\($').search
 
 
 def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
@@ -57,10 +57,12 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
 
     def add_space(text, prev):
         # return True if a space should be added
+        if prev == '\n':
+            return False
         return (prev is not None
-                and (not _has_trailing_whitespace(prev)
-                     and (not _has_punct_after(text)
-                     and not _has_punct_before(prev)
+                and (_has_trailing_whitespace(prev)
+                     or (not _has_punct_after(text)
+                     and not _has_open_bracket_before(prev)
                           )
                      )
                 )
@@ -76,7 +78,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
                 if guess_punct_space and not add_space(text, prev[0]):
                     space = ''
                 yield [space, text]
-                prev[0] = text
+                prev[0] = tree.text
                 space = ' '
 
         for child in tree:
@@ -98,12 +100,9 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
 
         if tail:
             yield [newline, space, tail]
-            prev[0] = tail
-            # space = ' '
-            # newline = ''
+            prev[0] = tree.tail
         elif newline:
             yield [newline]
-            # newline = ''
 
     text = []
     for fragment in traverse_text_fragments(tree, [None]):
