@@ -56,6 +56,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
     """
 
     def add_space(text, prev):
+        # return True if a space should be added
         return (prev is not None
                 and (not _has_trailing_whitespace(prev)
                      and (not _has_punct_after(text)
@@ -68,43 +69,41 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
         return tag in NEWLINE_TAGS and prev != '\n'
 
     def traverse_text_fragments(tree, prev):
-        space = ''
+        space = ' '
         if tree.text:
-            if guess_punct_space:
-                text = _whitespace.sub(' ', tree.text.strip())
-                if text and add_space(text, prev[0]):
-                    space = ' '
+            text = _whitespace.sub(' ', tree.text.strip())
+            if text:
+                if guess_punct_space and not add_space(text, prev[0]):
+                    space = ''
                 yield [space, text]
                 prev[0] = text
-                space = ''
-            else:
-                yield [tree.text]
-                prev[0] = tree.text
+                space = ' '
 
         for child in tree:
             for t in traverse_text_fragments(child, prev):
                 yield t
 
-        tail_text = []
+        newline = ''
         if guess_page_layout and add_newline(tree.tag, prev[0]):
-            tail_text.append('\n')
+            newline = '\n'
             prev[0] = '\n'
 
+        tail = ''
         if tree.tail:
-            if guess_punct_space:
-                text = _whitespace.sub(' ', tree.tail.strip())
-                if text:
-                    if (not tail_text # do not add space after newline
-                        and add_space(text, prev[0])):
-                        tail_text.append(' ')
+            tail = _whitespace.sub(' ', tree.tail.strip())
+            if tail:
+                if (guess_punct_space
+                    and (not add_space(tail, prev[0]) or newline)):
+                    space = ''
 
-                    tail_text.append(text)
-                    prev[0] = text
-            else:
-                tail_text.append(tree.tail)
-                prev[0] = tree.tail
-        if tail_text:
-            yield tail_text
+        if tail:
+            yield [newline, space, tail]
+            prev[0] = tail
+            # space = ' '
+            # newline = ''
+        elif newline:
+            yield [newline]
+            # newline = ''
 
     text = []
     for fragment in traverse_text_fragments(tree, [None]):
