@@ -62,11 +62,11 @@ def test_guess_page_layout():
                                     ('title text_1. text_2 text_3 text_4 text_5'
                                     ' text_6 text_7 text_8 text_9 ...text_10'))
     assert (extract_text(html, guess_punct_space=False, guess_page_layout=True) ==
-                            ('title\n text_1. text_2 text_3\n text_4\n text_5'
-                            '\n text_6 text_7 text_8\n text_9 ...text_10'))
+                    ('title\n\n text_1.\n\n text_2 text_3\n\n text_4\n text_5'
+                    '\n\n text_6 text_7 text_8\n\n text_9\n\n ...text_10'))
     assert (extract_text(html, guess_punct_space=True) ==
-                                    ('title text_1. text_2 text_3 text_4 text_5'
-                                    ' text_6 text_7 text_8 text_9...text_10'))
+                                ('title text_1. text_2 text_3 text_4 text_5'
+                                ' text_6 text_7 text_8 text_9...text_10'))
     assert (extract_text(html, guess_punct_space=True, guess_page_layout=True) ==
-                                  ('title\ntext_1. text_2 text_3\ntext_4\ntext_5'
-                                  '\ntext_6 text_7 text_8\ntext_9...text_10'))
+                          ('title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
+                          '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10'))

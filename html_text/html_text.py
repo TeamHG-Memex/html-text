@@ -6,8 +6,8 @@ import lxml.etree
 from lxml.html.clean import Cleaner
 
 
-NEWLINE_TAGS = ['title', 'p', 'li', 'dd', 'dt', 'dl', 'ul',
-                'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+NEWLINE_TAGS = ['li', 'dd', 'dt', 'dl', 'ul', 'ol']
+DOUBLE_NEWLINE_TAGS = ['title', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
 _clean_html = Cleaner(
     scripts=True,
@@ -59,7 +59,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
     def add_space(text, prev):
         if prev is None:
             return False
-        if prev == '\n':
+        if prev == '\n' or prev == '\n\n':
             return False
         if not _has_trailing_whitespace(prev):
             if _has_punct_after(text) or _has_open_bracket_before(prev):
@@ -67,36 +67,50 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
         return True
 
     def add_newline(tag, prev):
-        return tag in NEWLINE_TAGS and prev != '\n'
+        if prev is None or prev == '\n\n':
+            return ''
+        if tag in DOUBLE_NEWLINE_TAGS:
+            if prev == '\n':
+                return '\n'
+            return '\n\n'
+        if tag in NEWLINE_TAGS:
+            if prev == '\n':
+                return ''
+            return '\n'
+        return ''
 
     def traverse_text_fragments(tree, prev):
         space = ' '
+        newline = ''
         if tree.text:
             text = _whitespace.sub(' ', tree.text.strip())
             if text:
+                if guess_page_layout:
+                    newline = add_newline(tree.tag, prev[0])
+                    if newline:
+                        prev[0] = newline
                 if guess_punct_space and not add_space(text, prev[0]):
                     space = ''
-                yield [space, text]
+                yield [newline, space, text]
                 prev[0] = tree.text
                 space = ' '
+                newline = ''
 
         for child in tree:
             for t in traverse_text_fragments(child, prev):
                 yield t
 
-        newline = ''
-        if guess_page_layout and add_newline(tree.tag, prev[0]):
-            newline = '\n'
-            prev[0] = '\n'
+        if guess_page_layout:
+            newline = add_newline(tree.tag, prev[0])
+            if newline:
+                prev[0] = newline
 
         tail = ''
         if tree.tail:
             tail = _whitespace.sub(' ', tree.tail.strip())
             if tail:
-                if (guess_punct_space
-                    and (not add_space(tail, prev[0]) or newline)):
+                if guess_punct_space and not add_space(tail, prev[0]):
                     space = ''
-
         if tail:
             yield [newline, space, tail]
             prev[0] = tree.tail
@@ -107,8 +121,6 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
     for fragment in traverse_text_fragments(tree, [None]):
         text.extend(fragment)
     return ''.join(text).strip()
-
-
 
 def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True):
     """
