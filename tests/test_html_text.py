@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+import lxml
 
 from html_text import (extract_text, html_to_text, parse_html, parse_html,
                        cleaned_selector, selector_to_text)
@@ -61,20 +62,34 @@ def test_selector(all_options):
     assert selector_to_text(subsel, **all_options) == 'text more'
 
 
-def test_guess_page_layout():
+def test_html_to_text():
     html = (u'<title>  title  </title><div>text_1.<p>text_2 text_3</p><ul>'
              '<li>text_4</li><li>text_5</li></ul><p>text_6<em>text_7</em>'
-             'text_8</p>text_9</div><p>...text_10</p>'
-           )
-    assert (extract_text(html, guess_punct_space=False) ==
+             'text_8</p>text_9</div><p>...text_10</p>')
+
+    parser = lxml.html.HTMLParser(encoding='utf8')
+    tree = lxml.html.fromstring(html.encode('utf8'), parser=parser)
+
+    assert (html_to_text(tree, guess_punct_space=False) ==
                                     ('title text_1. text_2 text_3 text_4 text_5'
                                     ' text_6 text_7 text_8 text_9 ...text_10'))
-    assert (extract_text(html, guess_punct_space=False, guess_page_layout=True) ==
+    assert (html_to_text(tree, guess_punct_space=False, guess_page_layout=True) ==
                     ('title\n\n text_1.\n\n text_2 text_3\n\n text_4\n text_5'
                     '\n\n text_6 text_7 text_8\n\n text_9\n\n ...text_10'))
-    assert (extract_text(html, guess_punct_space=True) ==
+    assert (html_to_text(tree, guess_punct_space=True) ==
                                 ('title text_1. text_2 text_3 text_4 text_5'
                                 ' text_6 text_7 text_8 text_9...text_10'))
+    assert (html_to_text(tree, guess_punct_space=True, guess_page_layout=True) ==
+                          ('title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
+                          '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10'))
+
+def test_guess_page_layout():
+    html = (u'<title>  title  </title><div>text_1.<p>text_2 text_3</p>'
+             '<p id="demo"></p><ul><li>text_4</li><li>text_5</li></ul>'
+             '<p>text_6<em>text_7</em>text_8</p>text_9</div>'
+             '<script>document.getElementById("demo").innerHTML = '
+             '"This should be skipped";</script> <p>...text_10</p>'
+           )
     assert (extract_text(html, guess_punct_space=True, guess_page_layout=True) ==
                           ('title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
                           '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10'))
