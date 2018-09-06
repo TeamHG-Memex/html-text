@@ -4,6 +4,7 @@ import re
 import lxml
 import lxml.etree
 from lxml.html.clean import Cleaner
+import parsel
 
 
 NEWLINE_TAGS = ['li', 'dd', 'dt', 'dl', 'ul', 'ol']
@@ -79,7 +80,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
             return '\n'
         return ''
 
-    def traverse_text_fragments(tree, prev):
+    def traverse_text_fragments(tree, prev, depth):
         space = ' '
         newline = ''
         if tree.text:
@@ -97,7 +98,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
                 newline = ''
 
         for child in tree:
-            for t in traverse_text_fragments(child, prev):
+            for t in traverse_text_fragments(child, prev, depth+1):
                 yield t
 
         if guess_page_layout:
@@ -106,7 +107,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
                 prev[0] = newline
 
         tail = ''
-        if tree.tail:
+        if tree.tail and depth != 0:
             tail = _whitespace.sub(' ', tree.tail.strip())
             if tail:
                 if guess_punct_space and not add_space(tail, prev[0]):
@@ -118,9 +119,33 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
             yield [newline]
 
     text = []
-    for fragment in traverse_text_fragments(tree, [None]):
+    for fragment in traverse_text_fragments(tree, [None], 0):
         text.extend(fragment)
     return ''.join(text).strip()
+
+
+def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
+    """ Convert a cleaned selector to text.
+    See html_text.extract_text docstring for description of the approach and options.
+    """
+    return html_to_text(sel.root, guess_punct_space=guess_punct_space,
+                        guess_page_layout=guess_page_layout)
+
+
+def cleaned_selector(html):
+    """ Clean selector.
+    """
+    try:
+        tree = _cleaned_html_tree(html)
+        sel = parsel.Selector(root=tree, type='html')
+    except (lxml.etree.XMLSyntaxError,
+            lxml.etree.ParseError,
+            lxml.etree.ParserError,
+            UnicodeEncodeError):
+        # likely plain text
+        sel = parsel.Selector(html)
+    return sel
+
 
 def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True):
     """
@@ -138,4 +163,4 @@ def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True
     if html is None or len(html) == 0:
         return ''
     cleaned = _cleaned_html_tree(html)
-    return html_to_text(cleaned, guess_punct_space=guess_punct_space, guess_page_layout=guess_page_layout)
+    return html_to_text(cleaned, guess_punct_space=guess_punct_space, guess_page_layout=guess_page_layout,)
