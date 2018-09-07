@@ -6,9 +6,9 @@ import lxml.etree
 from lxml.html.clean import Cleaner
 import parsel
 
-
-NEWLINE_TAGS = ['li', 'dd', 'dt', 'dl', 'ul', 'ol']
-DOUBLE_NEWLINE_TAGS = ['title', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+NEWLINE_TAGS = frozenset(['li', 'dd', 'dt', 'dl', 'ul', 'ol'])
+DOUBLE_NEWLINE_TAGS = frozenset(
+    ['title', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
 
 _clean_html = Cleaner(
     scripts=True,
@@ -98,7 +98,7 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
                 newline = ''
 
         for child in tree:
-            for t in traverse_text_fragments(child, prev, depth+1):
+            for t in traverse_text_fragments(child, prev, depth + 1):
                 yield t
 
         if guess_page_layout:
@@ -126,10 +126,13 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
 
 def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
     """ Convert a cleaned selector to text.
-    See html_text.extract_text docstring for description of the approach and options.
+    See html_text.extract_text docstring for description of the approach
+    and options.
     """
-    return html_to_text(sel.root, guess_punct_space=guess_punct_space,
-                        guess_page_layout=guess_page_layout)
+    return html_to_text(
+        sel.root,
+        guess_punct_space=guess_punct_space,
+        guess_page_layout=guess_page_layout)
 
 
 def cleaned_selector(html):
@@ -138,16 +141,18 @@ def cleaned_selector(html):
     try:
         tree = _cleaned_html_tree(html)
         sel = parsel.Selector(root=tree, type='html')
-    except (lxml.etree.XMLSyntaxError,
-            lxml.etree.ParseError,
-            lxml.etree.ParserError,
-            UnicodeEncodeError):
+    except (lxml.etree.XMLSyntaxError, lxml.etree.ParseError,
+            lxml.etree.ParserError, UnicodeEncodeError):
         # likely plain text
         sel = parsel.Selector(html)
     return sel
 
 
-def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True):
+def extract_text(html,
+                 guess_punct_space=True,
+                 guess_page_layout=False,
+                 newline_tags=NEWLINE_TAGS,
+                 double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
     Convert html to text, cleaning invisible content such as styles.
     Almost the same as normalize-space xpath, but this also
@@ -158,9 +163,21 @@ def extract_text(html, guess_punct_space=True, guess_page_layout=False, new=True
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
 
+    When guess_page_layout is True (default is False), a newline is added after
+    NEWLINE_TAGS and two newlines after DOUBLE_NEWLINE_TAGS. This heuristic
+    makes the extracted text more similar to how it looks like in the browser.
+
+    NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be customized.
+
     html should be a unicode string or an already parsed lxml.html element.
     """
     if html is None or len(html) == 0:
         return ''
     cleaned = _cleaned_html_tree(html)
-    return html_to_text(cleaned, guess_punct_space=guess_punct_space, guess_page_layout=guess_page_layout,)
+    return html_to_text(
+        cleaned,
+        guess_punct_space=guess_punct_space,
+        guess_page_layout=guess_page_layout,
+        newline_tags=newline_tags,
+        double_newline_tags=double_newline_tags,
+    )
