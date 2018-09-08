@@ -6,9 +6,14 @@ import lxml.etree
 from lxml.html.clean import Cleaner
 import parsel
 
-NEWLINE_TAGS = frozenset(['li', 'dd', 'dt', 'dl', 'ul', 'ol'])
-DOUBLE_NEWLINE_TAGS = frozenset(
-    ['title', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+NEWLINE_TAGS = frozenset([
+    'br', 'article', 'aside', 'details', 'div', 'dd', 'dt', 'fieldset',
+    'figcaption', 'form', 'hr', 'li', 'main', 'nav', 'table', 'tr'
+])
+DOUBLE_NEWLINE_TAGS = frozenset([
+    'blockquote', 'dl', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header',
+    'ol', 'ul', 'p', 'pre', 'title', 'figure'
+])
 
 _clean_html = Cleaner(
     scripts=True,
