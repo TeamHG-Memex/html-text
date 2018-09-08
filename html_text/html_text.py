@@ -50,7 +50,11 @@ _has_punct_after = re.compile(r'^[,:;.!?"\)]').search
 _has_open_bracket_before = re.compile(r'\($').search
 
 
-def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
+def _html_to_text(tree,
+                  guess_punct_space=True,
+                  guess_page_layout=False,
+                  newline_tags=NEWLINE_TAGS,
+                  double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
     Convert a cleaned html tree to text.
     See html_text.extract_text docstring for description of the approach
@@ -70,11 +74,11 @@ def html_to_text(tree, guess_punct_space=True, guess_page_layout=False):
     def add_newline(tag, prev):
         if prev is None or prev == '\n\n':
             return ''
-        if tag in DOUBLE_NEWLINE_TAGS:
+        if tag in double_newline_tags:
             if prev == '\n':
                 return '\n'
             return '\n\n'
-        if tag in NEWLINE_TAGS:
+        if tag in newline_tags:
             if prev == '\n':
                 return ''
             return '\n'
@@ -129,7 +133,7 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
     See html_text.extract_text docstring for description of the approach
     and options.
     """
-    return html_to_text(
+    return _html_to_text(
         sel.root,
         guess_punct_space=guess_punct_space,
         guess_page_layout=guess_page_layout)
@@ -174,7 +178,7 @@ def extract_text(html,
     if html is None or len(html) == 0:
         return ''
     cleaned = _cleaned_html_tree(html)
-    return html_to_text(
+    return _html_to_text(
         cleaned,
         guess_punct_space=guess_punct_space,
         guess_page_layout=guess_page_layout,
