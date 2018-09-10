@@ -7,12 +7,19 @@ from lxml.html.clean import Cleaner
 import parsel
 
 NEWLINE_TAGS = frozenset([
-    'br', 'article', 'aside', 'details', 'div', 'dd', 'dt', 'fieldset',
-    'figcaption', 'form', 'hr', 'li', 'main', 'nav', 'table', 'tr'
+    'article', 'aside', 'br', 'dd', 'details', 'div', 'dt', 'fieldset',
+    'figcaption', 'footer', 'form', 'header', 'hr', 'legend', 'li', 'main',
+    'nav', 'table', 'tr'
 ])
 DOUBLE_NEWLINE_TAGS = frozenset([
-    'blockquote', 'dl', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header',
-    'ol', 'ul', 'p', 'pre', 'title', 'figure'
+    'blockquote', 'dl', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol',
+    'p', 'pre', 'title', 'ul'
+])
+INLINE_TEXT_TAGS = frozenset([
+    'abbr', 'acronym', 'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'del', 'dfn',
+    'em', 'i', 'ins', 'kbd', 'mark', 'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's',
+    'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'tt', 'u', 'var',
+    'wbr',
 ])
 
 _clean_html = Cleaner(
@@ -30,6 +37,7 @@ _clean_html = Cleaner(
     annoying_tags=False,
     remove_unknown_tags=False,
     safe_attrs_only=False,
+    remove_tags=INLINE_TEXT_TAGS,  # helps newline placement if guess_page_layout=True
 ).clean_html
 
 
@@ -92,19 +100,23 @@ def _html_to_text(tree,
     def traverse_text_fragments(tree, prev, depth):
         space = ' '
         newline = ''
+        text = ''
+        if guess_page_layout:
+            newline = add_newline(tree.tag, prev[0])
+            if newline:
+                prev[0] = newline
         if tree.text:
             text = _whitespace.sub(' ', tree.text.strip())
-            if text:
-                if guess_page_layout:
-                    newline = add_newline(tree.tag, prev[0])
-                    if newline:
-                        prev[0] = newline
-                if guess_punct_space and not add_space(text, prev[0]):
-                    space = ''
-                yield [newline, space, text]
-                prev[0] = tree.text
-                space = ' '
-                newline = ''
+            if text and guess_punct_space and not add_space(text, prev[0]):
+                space = ''
+        if text:
+            yield [newline, space, text]
+            prev[0] = tree.text
+            space = ' '
+            newline = ''
+        elif newline:
+            yield [newline]
+            newline = ''
 
         for child in tree:
             for t in traverse_text_fragments(child, prev, depth + 1):
