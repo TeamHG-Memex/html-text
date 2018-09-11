@@ -79,25 +79,23 @@ def _html_to_text(tree,
 
     def add_newline(tag, prev):
         if prev is None or prev == '\n\n':
-            return ''
+            return '', '\n\n'
         if tag in double_newline_tags:
             if prev == '\n':
-                return '\n'
-            return '\n\n'
+                return '\n', '\n\n'
+            return '\n\n', '\n\n'
         if tag in newline_tags:
             if prev == '\n':
-                return ''
-            return '\n'
-        return ''
+                return '', '\n'
+            return '\n', '\n'
+        return '', ''
 
     def traverse_text_fragments(tree, prev, depth):
         space = ' '
         newline = ''
         text = ''
         if guess_page_layout:
-            newline = add_newline(tree.tag, prev[0])
-            if newline:
-                prev[0] = newline
+            newline, prev[0] = add_newline(tree.tag, prev[0])
         if tree.text:
             text = _whitespace.sub(' ', tree.text.strip())
             if text and guess_punct_space and not add_space(text, prev[0]):
@@ -116,10 +114,8 @@ def _html_to_text(tree,
                 yield t
 
         if guess_page_layout:
-            newline = add_newline(tree.tag, prev[0])
-            if newline:
-                prev[0] = newline
-
+            newline, prev[0] = add_newline(tree.tag, prev[0])
+            
         tail = ''
         if tree.tail and depth != 0:
             tail = _whitespace.sub(' ', tree.tail.strip())
