@@ -58,6 +58,7 @@ def test_inline_tags_whitespace(all_options):
 def test_punct_whitespace():
     html = u'<div><span>field</span>, and more</div>'
     assert extract_text(html, guess_punct_space=False) == u'field , and more'
+    assert extract_text(html, guess_punct_space=True) == u'field, and more'
 
 
 def test_punct_whitespace_preserved():
@@ -66,6 +67,19 @@ def test_punct_whitespace_preserved():
     assert (extract_text(
         html, guess_punct_space=True) == u'по ле, and , more ! now a (boo)')
 
+
+def test_bad_punct_whitespace():
+    html = (u'<pre><span>trees</span> '
+            '<span>=</span> <span>webstruct</span>'
+            '<span>.</span><span>load_trees</span>'
+            '<span>(</span><span>&quot;train/*.html&quot;</span>'
+            '<span>)</span></pre>')
+    assert extract_text(
+        html, guess_punct_space=False) == (
+            u'trees = webstruct . load_trees ( "train/*.html" )')
+    assert extract_text(
+        html, guess_punct_space=True) == (
+            u'trees = webstruct. load_trees ("train/*.html")')
 
 def test_selector(all_options):
     html = (
