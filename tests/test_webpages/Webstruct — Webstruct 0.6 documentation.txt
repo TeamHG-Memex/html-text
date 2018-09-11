@@ -1,0 +1,91 @@
+Webstruct — Webstruct 0.6 documentation
+
+Webstruct
+latest
+
+Webstruct
+Tutorial
+Reference
+Changes
+
+Webstruct
+
+Docs »
+Webstruct
+Edit on GitHub
+
+Webstruct ¶
+
+Webstruct is a library for creating statistical NER systems that work on HTML data, i.e. a library for building tools that extract named entities (addresses, organization names, open hours, etc) from webpages.
+
+Contents:
+
+Webstruct
+
+Overview
+Installation
+
+Tutorial
+
+Get annotated data
+From HTML to Tokens
+Feature Extraction
+Using a Sequence Labelling Toolkit
+Named Entity Recognition
+Entity Grouping
+Model Development
+
+Reference
+
+HTML Loaders
+Feature Extraction
+Model Creation Helpers
+Metrics
+Entity Grouping
+Wapiti Helpers
+CRFsuite Helpers
+WebAnnotator Utilities
+BaseSequenceClassifier
+Miscellaneous
+
+Changes
+
+0.6 (2017-12-29)
+0.5 (2017-05-10)
+0.4.1 (2016-11-28)
+0.4 (2016-11-26)
+0.3 (2016-09-19)
+
+Indices and tables ¶
+
+Index
+Module Index
+Search Page
+
+Next
+
+© Copyright 2014-2017, Scrapinghub Inc.. Revision 9e461566.
+
+Built with Sphinx using a theme provided by Read the Docs.
+Read the Docs v: latest
+
+Versions
+latest
+stable
+0.6
+0.5
+0.4.1
+0.4
+0.3
+0.2
+
+Downloads
+pdf
+htmlzip
+epub
+
+On Read the Docs
+Project Home
+Builds
+
+Free document hosting provided by Read the Docs.

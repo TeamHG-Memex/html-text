@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytest
 import lxml
+import glob
+from pathlib import Path
 
 from html_text import (extract_text, parse_html, cleaned_selector,
                        selector_to_text)
@@ -113,3 +115,15 @@ def test_guess_page_layout():
         html, guess_punct_space=True, guess_page_layout=True) == (
             'title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
             '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10'))
+
+
+def test_webpages():
+    webpages = sorted(glob.glob('./test_webpages/*.html'))
+    extracted = sorted(glob.glob('./test_webpages/*.txt'))
+    for page, extr in zip(webpages, extracted):
+        with open(page, 'r', encoding='utf8') as f_in:
+            html = f_in.read()
+        with open(extr, 'r', encoding='utf8') as f_in:
+            expected = f_in.read()
+        assert (extract_text(
+            html, guess_punct_space=True, guess_page_layout=True) == expected)
