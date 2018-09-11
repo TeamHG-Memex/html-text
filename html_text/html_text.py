@@ -15,12 +15,6 @@ DOUBLE_NEWLINE_TAGS = frozenset([
     'blockquote', 'dl', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol',
     'p', 'pre', 'title', 'ul'
 ])
-INLINE_TEXT_TAGS = frozenset([
-    'abbr', 'acronym', 'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'del', 'dfn',
-    'em', 'i', 'ins', 'kbd', 'mark', 'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's',
-    'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'tt', 'u', 'var',
-    'wbr',
-])
 
 _clean_html = Cleaner(
     scripts=True,
@@ -37,7 +31,6 @@ _clean_html = Cleaner(
     annoying_tags=False,
     remove_unknown_tags=False,
     safe_attrs_only=False,
-    remove_tags=INLINE_TEXT_TAGS,  # helps newline placement if guess_page_layout=True
 ).clean_html
 
 
