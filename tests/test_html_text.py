@@ -31,7 +31,8 @@ def test_extract_no_text_html(all_options):
 
 
 def test_extract_text(all_options):
-    html = u'<html><style>.div {}</style><body><p>Hello,   world!</body></html>'
+    html = (u'<html><style>.div {}</style>'
+            '<body><p>Hello,   world!</body></html>')
     assert extract_text(html, **all_options) == u'Hello, world!'
 
 
@@ -47,7 +48,8 @@ def test_empty(all_options):
 
 
 def test_extract_text_from_tree(all_options):
-    html = u'<html><style>.div {}</style><body><p>Hello,   world!</body></html>'
+    html = (u'<html><style>.div {}</style>'
+            '<body><p>Hello,   world!</body></html>')
     tree = parse_html(html)
     assert extract_text(tree, **all_options) == u'Hello, world!'
 
@@ -85,9 +87,8 @@ def test_bad_punct_whitespace():
 
 
 def test_selector(all_options):
-    html = (
-        u'<span><span id="extract-me">text<span>more</span></span>and more text</span>'
-    )
+    html = (u'<span><span id="extract-me">text<span>more</span>'
+            '</span>and more text</span>')
     sel = cleaned_selector(html)
     assert selector_to_text(sel, **all_options) == 'text more and more text'
     subsel = sel.xpath('//span[@id="extract-me"]')[0]
@@ -115,6 +116,12 @@ def test_guess_page_layout():
         html, guess_punct_space=True, guess_page_layout=True) == (
             'title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
             '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10'))
+
+
+def test_adjust_newline():
+    html = u'<div>text 1</div><p>text 2</p>'
+    assert (extract_text(html, guess_punct_space=True,
+                         guess_page_layout=True) == ('text 1\n\ntext 2'))
 
 
 def test_webpages():
