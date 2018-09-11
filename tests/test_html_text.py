@@ -81,6 +81,7 @@ def test_bad_punct_whitespace():
         html, guess_punct_space=True) == (
             u'trees = webstruct. load_trees ("train/*.html")')
 
+
 def test_selector(all_options):
     html = (
         u'<span><span id="extract-me">text<span>more</span></span>and more text</span>'
