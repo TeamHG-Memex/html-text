@@ -21,6 +21,13 @@ def all_options(request):
     return request.param
 
 
+def test_extract_no_text_html(all_options):
+    html = (u'<!DOCTYPE html><html><body><p><video width="320" height="240" '
+            'controls><source src="movie.mp4" type="video/mp4"><source '
+            'src="movie.ogg" type="video/ogg"></video></p></body></html>')
+    assert extract_text(html, **all_options) == u''
+
+
 def test_extract_text(all_options):
     html = u'<html><style>.div {}</style><body><p>Hello,   world!</body></html>'
     assert extract_text(html, **all_options) == u'Hello, world!'
