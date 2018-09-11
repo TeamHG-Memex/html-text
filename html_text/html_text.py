@@ -86,9 +86,9 @@ def _html_to_text(tree,
             return '\n\n', '\n\n'
         if tag in newline_tags:
             if prev == '\n':
-                return '', '\n'
+                return '', prev
             return '\n', '\n'
-        return '', ''
+        return '', prev
 
     def traverse_text_fragments(tree, prev, depth):
         space = ' '
