@@ -118,7 +118,7 @@ def test_guess_page_layout():
 
 
 def test_adjust_newline():
-    html = u'<div>text 1</div><p>text 2</p>'
+    html = u'<div>text 1</div><p><div>text 2</div></p>'
     assert (extract_text(html, guess_punct_space=True,
                          guess_page_layout=True) == ('text 1\n\ntext 2'))
 
