@@ -70,7 +70,6 @@ def test_selector(all_options):
     assert selector_to_text(subsel, **all_options) == 'text more'
 
 
-
 def test_guess_page_layout():
     html = (u'<title>  title  </title><div>text_1.<p>text_2 text_3</p>'
             '<p id="demo"></p><ul><li>text_4</li><li>text_5</li></ul>'
