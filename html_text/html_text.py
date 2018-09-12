@@ -115,7 +115,7 @@ def _html_to_text(tree,
 
         if guess_page_layout:
             newline, prev[0] = add_newline(tree.tag, prev[0])
-            
+
         tail = ''
         if tree.tail and depth != 0:
             tail = _whitespace.sub(' ', tree.tail.strip())
