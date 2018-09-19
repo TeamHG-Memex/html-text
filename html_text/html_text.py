@@ -139,10 +139,20 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
     See html_text.extract_text docstring for description of the approach
     and options.
     """
-    return _html_to_text(
-        sel.root,
-        guess_punct_space=guess_punct_space,
-        guess_page_layout=guess_page_layout)
+    if isinstance(sel, list):
+        # if selecting a specific xpath
+        text = [
+            _html_to_text(
+                t.root,
+                guess_punct_space=guess_punct_space,
+                guess_page_layout=guess_page_layout) for t in sel
+        ]
+        return ' '.join(text)
+    else:
+        return _html_to_text(
+            sel.root,
+            guess_punct_space=guess_punct_space,
+            guess_page_layout=guess_page_layout)
 
 
 def cleaned_selector(html):
@@ -173,9 +183,10 @@ def extract_text(html,
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
 
-    When guess_page_layout is True (default is False), a newline is added after
-    NEWLINE_TAGS and two newlines after DOUBLE_NEWLINE_TAGS. This heuristic
-    makes the extracted text more similar to how it looks like in the browser.
+    When guess_page_layout is True (default is False), a newline is added
+    before and after NEWLINE_TAGS and two newlines are added before and after
+    DOUBLE_NEWLINE_TAGS. This heuristic makes the extracted text more similar
+    to how it is rendered in the browser.
 
     NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be customized.
 
