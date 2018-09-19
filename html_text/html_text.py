@@ -147,7 +147,7 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
                 guess_punct_space=guess_punct_space,
                 guess_page_layout=guess_page_layout) for t in sel
         ]
-        return ' '.join(text)
+        return text
     else:
         return _html_to_text(
             sel.root,

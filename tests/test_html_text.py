@@ -91,9 +91,9 @@ def test_selector(all_options):
     sel = cleaned_selector(html)
     assert selector_to_text(sel, **all_options) == 'text more and more text and some more'
     subsel = sel.xpath('//span[@id="extract-me"]')
-    assert selector_to_text(subsel, **all_options) == 'text more'
+    assert selector_to_text(subsel, **all_options) == ['text more']
     subsel = sel.xpath('//a')
-    assert selector_to_text(subsel, **all_options) == 'more and some more'
+    assert selector_to_text(subsel, **all_options) == ['more', 'and some more']
 
 
 def test_guess_page_layout():
