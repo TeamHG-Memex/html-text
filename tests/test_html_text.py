@@ -4,7 +4,7 @@ import lxml
 import glob
 
 from html_text import (extract_text, parse_html, cleaned_selector,
-                       selector_to_text)
+                       selector_to_text, NEWLINE_TAGS, DOUBLE_NEWLINE_TAGS)
 
 
 @pytest.fixture(params=[{
@@ -125,6 +125,24 @@ def test_adjust_newline():
     html = u'<div>text 1</div><p><div>text 2</div></p>'
     assert (extract_text(html, guess_punct_space=True,
                          guess_page_layout=True) == ('text 1\n\ntext 2'))
+
+
+def test_personalize_newlines_sets():
+    html = (u'<span><span>text<a>more</a>'
+            '</span>and more text <a> and some more</a> <a></a> </span>')
+    assert (extract_text(
+        html,
+        guess_punct_space=True,
+        guess_page_layout=True,
+        newline_tags=NEWLINE_TAGS | {'a'}
+        ) == 'text\nmore\nand more text\nand some more')
+
+    assert (extract_text(
+        html,
+        guess_punct_space=True,
+        guess_page_layout=True,
+        double_newline_tags=DOUBLE_NEWLINE_TAGS | {'a'}
+        ) == 'text\n\nmore\n\nand more text\n\nand some more')
 
 
 def test_webpages():

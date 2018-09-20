@@ -57,18 +57,27 @@ Usage
 Extract text from HTML::
 
     >>> import html_text
-    >>> text = html_text.extract_text(u'<h1>Hello</h1> world!')
+    >>> html_text.extract_text(u'<h1>Hello</h1> world!')
     u'Hello world!'
 
-    >>> text = html_text.extract_text(u'<h1>Hello</h1> world!', guess_page_layout=True)
-    u'Hello
-    world!'
+    >>> html_text.extract_text(u'<h1>Hello</h1> world!', guess_page_layout=True)
+    'Hello\n\nworld!'
+
+
+It is possible to add specific tags to `html_text.NEWLINE_TAGS` and
+`html_text.DOUBLE_NEWLINE_TAGS`:
+    >>> html_text.extract_text(
+        u'<a>Hello</a> world!',
+        guess_page_layout=True,
+        newline_tags=html_text.NEWLINE_TAGS | {'a'})
+    'Hello\n\nworld!'
+
 
 You can also pass already parsed ``lxml.html.HtmlElement``:
 
     >>> import html_text
     >>> tree = html_text.parse_html(u'<h1>Hello</h1> world!')
-    >>> text = html_text.extract_text(tree)
+    >>> html_text.extract_text(tree)
     u'Hello world!'
 
 Or define a selector to extract text only from specific elements:
@@ -76,7 +85,7 @@ Or define a selector to extract text only from specific elements:
     >>> import html_text
     >>> sel = html_text.cleaned_selector(u'<h1>Hello</h1> world!')
     >>> subsel = sel.xpath('//h1')
-    >>> text = html_text.selector_to_text(subsel)
+    >>> html_text.selector_to_text(subsel)
     u'Hello'
 
 Passed html will be first cleaned from invisible non-text content such
@@ -94,21 +103,10 @@ The main functions are ``html_text.extract_text``, ``html_text.cleaned_selector`
   text.
 
 If ``guess_page_layout`` is True (False by default for backward compatibility),
-a newline is added before and after NEWLINE_TAGS and two newlines are added
-before and after DOUBLE_NEWLINE_TAGS. This heuristic makes the extracted text
-more similar to how it is rendered in the browser.
-NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be customized, here are the lists of
-the tags that are handled by default:
-
-* NEWLINE_TAGS = frozenset([
-    'article', 'aside', 'br', 'dd', 'details', 'div', 'dt', 'fieldset',
-    'figcaption', 'footer', 'form', 'header', 'hr', 'legend', 'li', 'main',
-    'nav', 'table', 'tr'
-])
-* DOUBLE_NEWLINE_TAGS = frozenset([
-    'blockquote', 'dl', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol',
-    'p', 'pre', 'title', 'ul'
-])
+a newline is added before and after newline_tags and two newlines are added
+before and after double_newline_tags. This heuristic makes the extracted text
+more similar to how it is rendered in the browser. Default newline and double
+newline tags can be found in `html_text.NEWLINE_TAGS` and `html_text.DOUBLE_NEWLINE_TAGS`.
 
 
 Credits
