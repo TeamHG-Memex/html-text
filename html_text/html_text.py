@@ -149,7 +149,7 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
                 guess_page_layout=guess_page_layout)
             if extracted:
                 text.append(extracted)
-        return text
+        return ' '.join(text)
     else:
         return _html_to_text(
             sel.root,
