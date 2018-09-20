@@ -84,14 +84,14 @@ as styles, and then text would be extracted.
 NB Selectors are not cleaned automatically you need to call
 ``html_text.cleaned_selector`` first.
 
-Two functions that do it are ``html_text.cleaned_selector`` and
+The main functions are ``html_text.extract_text``, ``html_text.cleaned_selector`` and
 ``html_text.selector_to_text``:
 
+* ``html_text.extract_text`` accepts html and returns extracted text.
 * ``html_text.cleaned_selector`` accepts html as text or as ``lxml.html.HtmlElement``,
   and returns cleaned ``parsel.Selector``.
 * ``html_text.selector_to_text`` accepts ``parsel.Selector`` and returns extracted
   text.
-* ``html_text.extract_text`` accepts html and returns extracted text.
 
 If ``guess_page_layout`` is True (False by default for backward compatibility),
 a newline is added before and after NEWLINE_TAGS and two newlines are added
