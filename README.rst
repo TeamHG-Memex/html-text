@@ -71,17 +71,18 @@ You can also pass already parsed ``lxml.html.HtmlElement``:
     >>> text = html_text.extract_text(tree)
     u'Hello world!'
 
-Or define a selector to extract text only from specific elements, this will
-return a list of strings of text, one for each element:
+Or define a selector to extract text only from specific elements:
 
     >>> import html_text
     >>> sel = html_text.cleaned_selector(u'<h1>Hello</h1> world!')
     >>> subsel = sel.xpath('//h1')
     >>> text = html_text.selector_to_text(subsel)
-    [u'Hello']
+    u'Hello'
 
 Passed html will be first cleaned from invisible non-text content such
 as styles, and then text would be extracted.
+NB Selectors are not cleaned automatically you need to call
+``html_text.cleaned_selector`` first.
 
 Two functions that do it are ``html_text.cleaned_selector`` and
 ``html_text.selector_to_text``:
@@ -90,6 +91,24 @@ Two functions that do it are ``html_text.cleaned_selector`` and
   and returns cleaned ``parsel.Selector``.
 * ``html_text.selector_to_text`` accepts ``parsel.Selector`` and returns extracted
   text.
+* ``html_text.extract_text`` accepts html and returns extracted text.
+
+If ``guess_page_layout`` is True (False by default for backward compatibility),
+a newline is added before and after NEWLINE_TAGS and two newlines are added
+before and after DOUBLE_NEWLINE_TAGS. This heuristic makes the extracted text
+more similar to how it is rendered in the browser.
+NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be customized, here are the lists of
+the tags that are handled by default:
+
+* NEWLINE_TAGS = frozenset([
+    'article', 'aside', 'br', 'dd', 'details', 'div', 'dt', 'fieldset',
+    'figcaption', 'footer', 'form', 'header', 'hr', 'legend', 'li', 'main',
+    'nav', 'table', 'tr'
+])
+* DOUBLE_NEWLINE_TAGS = frozenset([
+    'blockquote', 'dl', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol',
+    'p', 'pre', 'title', 'ul'
+])
 
 
 Credits
