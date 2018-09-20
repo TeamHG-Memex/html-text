@@ -26,9 +26,10 @@ or ``.get_text()`` from Beautiful Soup?
 Text extracted with ``html_text`` does not contain inline styles,
 javascript, comments and other text that is not normally visible to the users.
 It normalizes whitespace, but is also smarter than ``.xpath('normalize-space())``,
-adding spaces around inline elements too
-(which are often used as block elements in html markup),
-and tries to avoid adding extra spaces for punctuation.
+adding spaces around inline elements (which are often used as block
+elements in html markup), tries to avoid adding extra spaces for punctuation and
+can add newlines so that the output text looks like how it is rendered in
+browsers.
 
 Apart from just getting text from the page (e.g. for display or search),
 one intended usage of this library is for machine learning (feature extraction).
@@ -56,18 +57,32 @@ Usage
 Extract text from HTML::
 
     >>> import html_text
-    >>> text = html_text.extract_text(u'<h1>Hey</h1>')
-    u'Hey'
+    >>> text = html_text.extract_text(u'<h1>Hello</h1> world!')
+    u'Hello world!'
+
+    >>> text = html_text.extract_text(u'<h1>Hello</h1> world!', guess_page_layout=True)
+    u'Hello
+    world!'
 
 You can also pass already parsed ``lxml.html.HtmlElement``:
 
     >>> import html_text
-    >>> tree = html_text.parse_html(u'<h1>Hey</h1>')
+    >>> tree = html_text.parse_html(u'<h1>Hello</h1> world!')
     >>> text = html_text.extract_text(tree)
-    u'Hey'
+    u'Hello world!'
+
+Or define a selector to extract text only from specific elements, this will
+return a list of strings of text, one for each element:
+
+    >>> import html_text
+    >>> sel = html_text.cleaned_selector(u'<h1>Hello</h1> world!')
+    >>> subsel = sel.xpath('//h1')
+    >>> text = html_text.selector_to_text(subsel)
+    [u'Hello']
 
 Passed html will be first cleaned from invisible non-text content such
 as styles, and then text would be extracted.
+
 Two functions that do it are ``html_text.cleaned_selector`` and
 ``html_text.selector_to_text``:
 

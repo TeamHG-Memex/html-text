@@ -141,12 +141,14 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
     """
     if isinstance(sel, list):
         # if selecting a specific xpath
-        text = [
-            _html_to_text(
+        text = []
+        for t in sel:
+            extracted = _html_to_text(
                 t.root,
                 guess_punct_space=guess_punct_space,
-                guess_page_layout=guess_page_layout) for t in sel
-        ]
+                guess_page_layout=guess_page_layout)
+            if extracted:
+                text.append(extracted)
         return text
     else:
         return _html_to_text(

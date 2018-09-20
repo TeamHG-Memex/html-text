@@ -87,13 +87,15 @@ def test_bad_punct_whitespace():
 
 def test_selector(all_options):
     html = (u'<span><span id="extract-me">text<a>more</a>'
-            '</span>and more text <a> and some more</a></span>')
+            '</span>and more text <a> and some more</a> <a></a> </span>')
     sel = cleaned_selector(html)
     assert selector_to_text(sel, **all_options) == 'text more and more text and some more'
     subsel = sel.xpath('//span[@id="extract-me"]')
     assert selector_to_text(subsel, **all_options) == ['text more']
     subsel = sel.xpath('//a')
     assert selector_to_text(subsel, **all_options) == ['more', 'and some more']
+    subsel = sel.xpath('//a[@id="extract-me"]')
+    assert selector_to_text(subsel, **all_options) == []
 
 
 def test_guess_page_layout():
