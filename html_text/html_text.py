@@ -186,11 +186,12 @@ def extract_text(html,
     and is just a heuristic.
 
     When guess_page_layout is True (default is False), a newline is added
-    before and after NEWLINE_TAGS and two newlines are added before and after
-    DOUBLE_NEWLINE_TAGS. This heuristic makes the extracted text more similar
+    before and after newline_tags and two newlines are added before and after
+    double_newline_tags. This heuristic makes the extracted text more similar
     to how it is rendered in the browser.
 
-    NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be customized.
+    NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be extended, check readme for
+    an example on how to do it.
 
     html should be a unicode string or an already parsed lxml.html element.
     """
