@@ -2,6 +2,14 @@
 History
 =======
 
+0.4.0 TDB
+------------------
+
+* Add ``guess_page_layout`` to make extracted text look like how it is rendered
+  in browser.
+* Add tests of layout extraction for real webpages.
+
+
 0.3.0 (2017-10-12)
 ------------------
 
