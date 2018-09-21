@@ -57,44 +57,34 @@ Usage
 Extract text from HTML::
 
     >>> import html_text
-    >>> html_text.extract_text(u'<h1>Hello</h1> world!')
-    u'Hello world!'
+    >>> html_text.extract_text('<h1>Hello</h1> world!')
+    'Hello world!'
 
     >>> html_text.extract_text(u'<h1>Hello</h1> world!', guess_page_layout=True)
-    'Hello\n\nworld!'
-
-
-It is possible to add specific tags to `html_text.NEWLINE_TAGS` and
-`html_text.DOUBLE_NEWLINE_TAGS`:
-    >>> html_text.extract_text(
-        u'<a>Hello</a> world!',
-        guess_page_layout=True,
-        newline_tags=html_text.NEWLINE_TAGS | {'a'})
     'Hello\n\nworld!'
 
 
 You can also pass already parsed ``lxml.html.HtmlElement``:
 
     >>> import html_text
-    >>> tree = html_text.parse_html(u'<h1>Hello</h1> world!')
+    >>> tree = html_text.parse_html('<h1>Hello</h1> world!')
     >>> html_text.extract_text(tree)
-    u'Hello world!'
+    'Hello world!'
 
 Or define a selector to extract text only from specific elements:
 
     >>> import html_text
-    >>> sel = html_text.cleaned_selector(u'<h1>Hello</h1> world!')
+    >>> sel = html_text.cleaned_selector('<h1>Hello</h1> world!')
     >>> subsel = sel.xpath('//h1')
     >>> html_text.selector_to_text(subsel)
-    u'Hello'
+    'Hello'
 
 Passed html will be first cleaned from invisible non-text content such
 as styles, and then text would be extracted.
 NB Selectors are not cleaned automatically you need to call
 ``html_text.cleaned_selector`` first.
 
-The main functions are ``html_text.extract_text``, ``html_text.cleaned_selector`` and
-``html_text.selector_to_text``:
+Main functions:
 
 * ``html_text.extract_text`` accepts html and returns extracted text.
 * ``html_text.cleaned_selector`` accepts html as text or as ``lxml.html.HtmlElement``,
@@ -103,11 +93,22 @@ The main functions are ``html_text.extract_text``, ``html_text.cleaned_selector`
   text.
 
 If ``guess_page_layout`` is True (False by default for backward compatibility),
-a newline is added before and after newline_tags and two newlines are added
-before and after double_newline_tags. This heuristic makes the extracted text
+a newline is added before and after ``newline_tags`` and two newlines are added
+before and after ``double_newline_tags``. This heuristic makes the extracted text
 more similar to how it is rendered in the browser. Default newline and double
-newline tags can be found in `html_text.NEWLINE_TAGS` and `html_text.DOUBLE_NEWLINE_TAGS`.
+newline tags can be found in `html_text.NEWLINE_TAGS`
+and `html_text.DOUBLE_NEWLINE_TAGS`.
 
+It is possible to customize how newlines are added, using ``newline_tags`` and
+``double_newline_tags`` arguments (which are `html_text.NEWLINE_TAGS` and
+`html_text.DOUBLE_NEWLINE_TAGS` by default). For example, don't add a newline
+after ``<div>`` tags:
+
+    >>> newline_tags = html_text.NEWLINE_TAGS - {'div'}
+    >>> html_text.extract_text('<div>Hello</div> world!',
+    ...                        guess_page_layout=True,
+    ...                        newline_tags=newline_tags)
+    'Hello world!'
 
 Credits
 -------
