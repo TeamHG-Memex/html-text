@@ -6,6 +6,7 @@ import lxml.etree
 from lxml.html.clean import Cleaner
 import parsel
 
+
 NEWLINE_TAGS = frozenset([
     'article', 'aside', 'br', 'dd', 'details', 'div', 'dt', 'fieldset',
     'figcaption', 'footer', 'form', 'header', 'hr', 'legend', 'li', 'main',
@@ -56,6 +57,10 @@ _has_punct_after = re.compile(r'^[,:;.!?"\)]').search
 _has_open_bracket_before = re.compile(r'\($').search
 
 
+def _normalize_whitespace(text):
+    return _whitespace.sub(' ', text.strip())
+
+
 def _html_to_text(tree,
                   guess_punct_space=True,
                   guess_page_layout=False,
@@ -90,15 +95,20 @@ def _html_to_text(tree,
             return '\n', '\n'
         return '', prev
 
-    def traverse_text_fragments(tree, prev, depth):
+    def reset_space(text, prev):
+        return text and guess_punct_space and not add_space(text, prev[0])
+
+    def traverse_text_fragments(tree, prev, handle_tail=True):
+        """ Traverse a tree, yielding chunks of text """
+        assert len(prev) == 1
         space = ' '
         newline = ''
         text = ''
         if guess_page_layout:
             newline, prev[0] = add_newline(tree.tag, prev[0])
         if tree.text:
-            text = _whitespace.sub(' ', tree.text.strip())
-            if text and guess_punct_space and not add_space(text, prev[0]):
+            text = _normalize_whitespace(tree.text)
+            if reset_space(text, prev):
                 space = ''
         if text:
             yield [newline, space, text]
@@ -110,18 +120,17 @@ def _html_to_text(tree,
             newline = ''
 
         for child in tree:
-            for t in traverse_text_fragments(child, prev, depth + 1):
-                yield t
+            for fragments in traverse_text_fragments(child, prev):
+                yield fragments
 
         if guess_page_layout:
             newline, prev[0] = add_newline(tree.tag, prev[0])
 
         tail = ''
-        if tree.tail and depth != 0:
-            tail = _whitespace.sub(' ', tree.tail.strip())
-            if tail:
-                if guess_punct_space and not add_space(tail, prev[0]):
-                    space = ''
+        if tree.tail and handle_tail:
+            tail = _normalize_whitespace(tree.tail)
+            if reset_space(tail, prev):
+                space = ''
         if tail:
             yield [newline, space, tail]
             prev[0] = tree.tail
@@ -129,8 +138,8 @@ def _html_to_text(tree,
             yield [newline]
 
     text = []
-    for fragment in traverse_text_fragments(tree, [None], 0):
-        text.extend(fragment)
+    for fragments in traverse_text_fragments(tree, [None], handle_tail=False):
+        text.extend(fragments)
     return ''.join(text).strip()
 
 
@@ -139,12 +148,12 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
     See html_text.extract_text docstring for description of the approach
     and options.
     """
-    if isinstance(sel, list):
+    if isinstance(sel, parsel.SelectorList):
         # if selecting a specific xpath
         text = []
-        for t in sel:
+        for s in sel:
             extracted = _html_to_text(
-                t.root,
+                s.root,
                 guess_punct_space=guess_punct_space,
                 guess_page_layout=guess_page_layout)
             if extracted:
