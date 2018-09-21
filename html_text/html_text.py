@@ -181,19 +181,19 @@ def extract_text(html,
     adds spaces between inline elements (like <span>) which are
     often used as block elements in html markup.
 
+    html should be a unicode string or an already parsed lxml.html element.
+
     When guess_punct_space is True (default), no extra whitespace is added
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
 
     When guess_page_layout is True (default is False), a newline is added
-    before and after newline_tags and two newlines are added before and after
-    double_newline_tags. This heuristic makes the extracted text more similar
-    to how it is rendered in the browser.
+    before and after ``newline_tags`` and two newlines are added before
+    and after ``double_newline_tags``. This heuristic makes the extracted
+    text more similar to how it is rendered in the browser.
 
-    NEWLINE_TAGS and DOUBLE_NEWLINE_TAGS can be extended, check readme for
-    an example on how to do it.
-
-    html should be a unicode string or an already parsed lxml.html element.
+    Default newline and double newline tags can be found in
+    `html_text.NEWLINE_TAGS` and `html_text.DOUBLE_NEWLINE_TAGS`.
     """
     if html is None or len(html) == 0:
         return ''
