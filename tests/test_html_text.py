@@ -65,18 +65,18 @@ def test_punct_whitespace_preserved():
     assert text == u'по ле, and , more ! now a (boo)'
 
 
+@pytest.mark.xfail(reason="code punctuation should be handled differently")
 def test_bad_punct_whitespace():
     html = (u'<pre><span>trees</span> '
             '<span>=</span> <span>webstruct</span>'
             '<span>.</span><span>load_trees</span>'
             '<span>(</span><span>&quot;train/*.html&quot;</span>'
             '<span>)</span></pre>')
-    assert extract_text(
-        html, guess_punct_space=False) == (
-            u'trees = webstruct . load_trees ( "train/*.html" )')
-    assert extract_text(
-        html, guess_punct_space=True) == (
-            u'trees = webstruct. load_trees ("train/*.html")')
+    text = extract_text(html, guess_punct_space=False)
+    assert text == u'trees = webstruct . load_trees ( "train/*.html" )'
+
+    text = extract_text(html, guess_punct_space=True)
+    assert text == u'trees = webstruct.load_trees("train/*.html")'
 
 
 def test_selector(all_options):
