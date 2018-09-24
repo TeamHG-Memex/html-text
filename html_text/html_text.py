@@ -71,10 +71,14 @@ def _html_to_text(tree,
     See html_text.extract_text docstring for description of the approach
     and options.
     """
+    chunks = []
 
-    def add_space(text, prev):
-        if prev is None:
-            return False
+    class Context:
+        """ workaround for missing `nonlocal` in Python 2 """
+        prev = '\n\n'
+
+    def should_add_space(text, prev):  # type: (str, str) -> bool
+        """ Return True if extra whitespace should be added before text """
         if prev == '\n' or prev == '\n\n':
             return False
         if not _has_trailing_whitespace(prev):
@@ -82,65 +86,45 @@ def _html_to_text(tree,
                 return False
         return True
 
-    def add_newline(tag, prev):
-        if prev is None or prev == '\n\n':
-            return '', '\n\n'
+    def get_space_between(text, prev):
+        if not text or not guess_punct_space:
+            return ' '
+        return ' ' if should_add_space(text, prev) else ''
+
+    def add_newlines(tag, context):
+        if not guess_page_layout:
+            return
+        prev = context.prev
+        if prev == '\n\n':  # don't output more than 1 blank line
+            return
         if tag in double_newline_tags:
-            if prev == '\n':
-                return '\n', '\n\n'
-            return '\n\n', '\n\n'
-        if tag in newline_tags:
-            if prev == '\n':
-                return '', prev
-            return '\n', '\n'
-        return '', prev
+            context.prev = '\n\n'
+            chunks.append('\n' if prev == '\n' else '\n\n')
+        elif tag in newline_tags:
+            context.prev = '\n'
+            if prev != '\n':
+                chunks.append('\n')
 
-    def reset_space(text, prev):
-        return text and guess_punct_space and not add_space(text, prev[0])
+    def add_text(text_content, context):
+        text = _normalize_whitespace(text_content) if text_content else ''
+        if not text:
+            return
+        space = get_space_between(text, context.prev)
+        chunks.extend([space, text])
+        context.prev = text_content
 
-    def traverse_text_fragments(tree, prev, handle_tail=True):
-        """ Traverse a tree, yielding chunks of text """
-        assert len(prev) == 1
-        space = ' '
-        newline = ''
-        text = ''
-        if guess_page_layout:
-            newline, prev[0] = add_newline(tree.tag, prev[0])
-        if tree.text:
-            text = _normalize_whitespace(tree.text)
-            if reset_space(text, prev):
-                space = ''
-        if text:
-            yield [newline, space, text]
-            prev[0] = tree.text
-            space = ' '
-            newline = ''
-        elif newline:
-            yield [newline]
-            newline = ''
-
+    def traverse_text_fragments(tree, context, handle_tail=True):
+        """ Extract text from the ``tree``: fill ``chunks`` variable """
+        add_newlines(tree.tag, context)
+        add_text(tree.text, context)
         for child in tree:
-            for fragments in traverse_text_fragments(child, prev):
-                yield fragments
+            traverse_text_fragments(child, context)
+        add_newlines(tree.tag, context)
+        if handle_tail:
+            add_text(tree.tail, context)
 
-        if guess_page_layout:
-            newline, prev[0] = add_newline(tree.tag, prev[0])
-
-        tail = ''
-        if tree.tail and handle_tail:
-            tail = _normalize_whitespace(tree.tail)
-            if reset_space(tail, prev):
-                space = ''
-        if tail:
-            yield [newline, space, tail]
-            prev[0] = tree.tail
-        elif newline:
-            yield [newline]
-
-    text = []
-    for fragments in traverse_text_fragments(tree, [None], handle_tail=False):
-        text.extend(fragments)
-    return ''.join(text).strip()
+    traverse_text_fragments(tree, context=Context(), handle_tail=False)
+    return ''.join(chunks).strip()
 
 
 def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
