@@ -63,7 +63,7 @@ def _normalize_whitespace(text):
 
 def _html_to_text(tree,
                   guess_punct_space=True,
-                  guess_page_layout=False,
+                  guess_layout=False,
                   newline_tags=NEWLINE_TAGS,
                   double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
@@ -92,7 +92,7 @@ def _html_to_text(tree,
         return ' ' if should_add_space(text, prev) else ''
 
     def add_newlines(tag, context):
-        if not guess_page_layout:
+        if not guess_layout:
             return
         prev = context.prev
         if prev == '\n\n':  # don't output more than 1 blank line
@@ -127,7 +127,7 @@ def _html_to_text(tree,
     return ''.join(chunks).strip()
 
 
-def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
+def selector_to_text(sel, guess_punct_space=True, guess_layout=False):
     """ Convert a cleaned selector to text.
     See html_text.extract_text docstring for description of the approach
     and options.
@@ -139,7 +139,7 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
             extracted = _html_to_text(
                 s.root,
                 guess_punct_space=guess_punct_space,
-                guess_page_layout=guess_page_layout)
+                guess_layout=guess_layout)
             if extracted:
                 text.append(extracted)
         return ' '.join(text)
@@ -147,7 +147,7 @@ def selector_to_text(sel, guess_punct_space=True, guess_page_layout=False):
         return _html_to_text(
             sel.root,
             guess_punct_space=guess_punct_space,
-            guess_page_layout=guess_page_layout)
+            guess_layout=guess_layout)
 
 
 def cleaned_selector(html):
@@ -167,7 +167,7 @@ def cleaned_selector(html):
 
 def extract_text(html,
                  guess_punct_space=True,
-                 guess_page_layout=False,
+                 guess_layout=False,
                  newline_tags=NEWLINE_TAGS,
                  double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
@@ -182,7 +182,7 @@ def extract_text(html,
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
 
-    When guess_page_layout is True (default is False), a newline is added
+    When guess_layout is True (default is False), a newline is added
     before and after ``newline_tags`` and two newlines are added before
     and after ``double_newline_tags``. This heuristic makes the extracted
     text more similar to how it is rendered in the browser.
@@ -196,7 +196,7 @@ def extract_text(html,
     return _html_to_text(
         cleaned,
         guess_punct_space=guess_punct_space,
-        guess_page_layout=guess_page_layout,
+        guess_layout=guess_layout,
         newline_tags=newline_tags,
         double_newline_tags=double_newline_tags,
     )

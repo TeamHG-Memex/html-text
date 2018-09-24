@@ -60,7 +60,7 @@ Extract text from HTML::
     >>> html_text.extract_text('<h1>Hello</h1> world!')
     'Hello world!'
 
-    >>> html_text.extract_text(u'<h1>Hello</h1> world!', guess_page_layout=True)
+    >>> html_text.extract_text(u'<h1>Hello</h1> world!', guess_layout=True)
     'Hello\n\nworld!'
 
 
@@ -92,7 +92,7 @@ Main functions:
 * ``html_text.selector_to_text`` accepts ``parsel.Selector`` and returns extracted
   text.
 
-If ``guess_page_layout`` is True (False by default for backward compatibility),
+If ``guess_layout`` is True (False by default for backward compatibility),
 a newline is added before and after ``newline_tags`` and two newlines are added
 before and after ``double_newline_tags``. This heuristic makes the extracted text
 more similar to how it is rendered in the browser. Default newline and double
@@ -106,7 +106,7 @@ after ``<div>`` tags:
 
     >>> newline_tags = html_text.NEWLINE_TAGS - {'div'}
     >>> html_text.extract_text('<div>Hello</div> world!',
-    ...                        guess_page_layout=True,
+    ...                        guess_layout=True,
     ...                        newline_tags=newline_tags)
     'Hello world!'
 

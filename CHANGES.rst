@@ -5,8 +5,8 @@ History
 0.4.0 TDB
 ------------------
 
-* Add ``guess_page_layout`` to make extracted text look like how it is rendered
-  in browser.
+* ``guess_layout`` option to to make extracted text look more like how
+  it is rendered in browser.
 * Add tests of layout extraction for real webpages.
 
 
