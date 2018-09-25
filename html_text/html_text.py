@@ -73,14 +73,19 @@ def _html_to_text(tree,
     """
     chunks = []
 
+    _NEWLINE = object()
+    _DOUBLE_NEWLINE = object()
+
     class Context:
         """ workaround for missing `nonlocal` in Python 2 """
-        prev = '\n\n'  # can be '\n', '\n\n' or content of the previous chunk
+        # _NEWLINE, _DOUBLE_NEWLINE or content of the previous chunk (str)
+        prev = _DOUBLE_NEWLINE
 
-    def should_add_space(text, prev):  # type: (str, str) -> bool
+    def should_add_space(text, prev):
         """ Return True if extra whitespace should be added before text """
-        if prev == '\n' or prev == '\n\n':
+        if prev in {_NEWLINE, _DOUBLE_NEWLINE}:
             return False
+        assert isinstance(prev, str)
         if not _has_trailing_whitespace(prev):
             if _has_punct_after(text) or _has_open_bracket_before(prev):
                 return False
@@ -95,14 +100,14 @@ def _html_to_text(tree,
         if not guess_layout:
             return
         prev = context.prev
-        if prev == '\n\n':  # don't output more than 1 blank line
+        if prev is _DOUBLE_NEWLINE:  # don't output more than 1 blank line
             return
         if tag in double_newline_tags:
-            context.prev = '\n\n'
-            chunks.append('\n' if prev == '\n' else '\n\n')
+            context.prev = _DOUBLE_NEWLINE
+            chunks.append('\n' if prev is _NEWLINE else '\n\n')
         elif tag in newline_tags:
-            context.prev = '\n'
-            if prev != '\n':
+            context.prev = _NEWLINE
+            if prev is not _NEWLINE:
                 chunks.append('\n')
 
     def add_text(text_content, context):
@@ -111,8 +116,6 @@ def _html_to_text(tree,
             return
         space = get_space_between(text, context.prev)
         chunks.extend([space, text])
-        # XXX: text_content can't be '\n' or '\n\n', because
-        # _normalize_whitespace('\n') is empty.
         context.prev = text_content
 
     def traverse_text_fragments(tree, context, handle_tail=True):
