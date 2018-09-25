@@ -20,7 +20,7 @@ test_requirements = [
 
 setup(
     name='html_text',
-    version='0.3.0',
+    version='0.4.0',
     description="Extract text from HTML",
     long_description=readme + '\n\n' + history,
     author="Konstantin Lopukhin",
