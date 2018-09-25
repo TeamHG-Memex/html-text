@@ -53,7 +53,7 @@ def parse_html(html):
 
 _whitespace = re.compile(r'\s+')
 _has_trailing_whitespace = re.compile(r'\s$').search
-_has_punct_after = re.compile(r'^[,:;.!?"\)]').search
+_has_punct_after = re.compile(r'^[,:;.!?")]').search
 _has_open_bracket_before = re.compile(r'\($').search
 
 
