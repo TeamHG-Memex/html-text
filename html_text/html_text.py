@@ -63,7 +63,7 @@ def _normalize_whitespace(text):
 
 def _html_to_text(tree,
                   guess_punct_space=True,
-                  guess_layout=False,
+                  guess_layout=True,
                   newline_tags=NEWLINE_TAGS,
                   double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
@@ -129,7 +129,7 @@ def _html_to_text(tree,
     return ''.join(chunks).strip()
 
 
-def selector_to_text(sel, guess_punct_space=True, guess_layout=False):
+def selector_to_text(sel, guess_punct_space=True, guess_layout=True):
     """ Convert a cleaned selector to text.
     See html_text.extract_text docstring for description of the approach
     and options.
@@ -169,14 +169,16 @@ def cleaned_selector(html):
 
 def extract_text(html,
                  guess_punct_space=True,
-                 guess_layout=False,
+                 guess_layout=True,
                  newline_tags=NEWLINE_TAGS,
                  double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
     Convert html to text, cleaning invisible content such as styles.
+
     Almost the same as normalize-space xpath, but this also
     adds spaces between inline elements (like <span>) which are
-    often used as block elements in html markup.
+    often used as block elements in html markup, and adds appropriate
+    newlines to make output better formatted.
 
     html should be a unicode string or an already parsed lxml.html element.
 
@@ -184,7 +186,7 @@ def extract_text(html,
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
 
-    When guess_layout is True (default is False), a newline is added
+    When guess_layout is True (default), a newline is added
     before and after ``newline_tags`` and two newlines are added before
     and after ``double_newline_tags``. This heuristic makes the extracted
     text more similar to how it is rendered in the browser.

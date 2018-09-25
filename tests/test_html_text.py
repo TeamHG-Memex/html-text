@@ -7,8 +7,8 @@ from html_text import (extract_text, parse_html, cleaned_selector,
 
 
 @pytest.fixture(params=[
-    {'guess_punct_space': True},
-    {'guess_punct_space': False},
+    {'guess_punct_space': True, 'guess_layout': False},
+    {'guess_punct_space': False, 'guess_layout': False},
     {'guess_punct_space': True, 'guess_layout': True},
     {'guess_punct_space': False, 'guess_layout': True}
 ])
@@ -61,7 +61,7 @@ def test_punct_whitespace():
 def test_punct_whitespace_preserved():
     html = (u'<div><span>по</span><span>ле</span>, and  ,  '
             u'<span>more </span>!<span>now</div>a (<b>boo</b>)')
-    text = extract_text(html, guess_punct_space=True)
+    text = extract_text(html, guess_punct_space=True, guess_layout=False)
     assert text == u'по ле, and , more ! now a (boo)'
 
 
@@ -72,10 +72,10 @@ def test_bad_punct_whitespace():
             '<span>.</span><span>load_trees</span>'
             '<span>(</span><span>&quot;train/*.html&quot;</span>'
             '<span>)</span></pre>')
-    text = extract_text(html, guess_punct_space=False)
+    text = extract_text(html, guess_punct_space=False, guess_layout=False)
     assert text == u'trees = webstruct . load_trees ( "train/*.html" )'
 
-    text = extract_text(html, guess_punct_space=True)
+    text = extract_text(html, guess_punct_space=True, guess_layout=False)
     assert text == u'trees = webstruct.load_trees("train/*.html")'
 
 
@@ -98,21 +98,22 @@ def test_guess_layout():
             '<p>text_6<em>text_7</em>text_8</p>text_9</div>'
             '<script>document.getElementById("demo").innerHTML = '
             '"This should be skipped";</script> <p>...text_10</p>')
-    assert (extract_text(html, guess_punct_space=False) == (
-        'title text_1. text_2 text_3 text_4 text_5'
-        ' text_6 text_7 text_8 text_9 ...text_10'))
-    assert (extract_text(
-        html, guess_punct_space=False, guess_layout=True) == (
-            'title\n\n text_1.\n\n text_2 text_3\n\n text_4\n text_5'
-            '\n\n text_6 text_7 text_8\n\n text_9\n\n ...text_10'))
-    assert (extract_text(
-        html,
-        guess_punct_space=True) == ('title text_1. text_2 text_3 text_4 text_5'
-                                    ' text_6 text_7 text_8 text_9...text_10'))
-    assert (extract_text(
-        html, guess_punct_space=True, guess_layout=True) == (
-            'title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
-            '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10'))
+
+    text = 'title text_1. text_2 text_3 text_4 text_5 text_6 text_7 ' \
+           'text_8 text_9 ...text_10'
+    assert extract_text(html, guess_punct_space=False, guess_layout=False) == text
+
+    text = ('title\n\n text_1.\n\n text_2 text_3\n\n text_4\n text_5'
+            '\n\n text_6 text_7 text_8\n\n text_9\n\n ...text_10')
+    assert extract_text(html, guess_punct_space=False, guess_layout=True) == text
+
+    text = 'title text_1. text_2 text_3 text_4 text_5 text_6 text_7 ' \
+           'text_8 text_9...text_10'
+    assert extract_text(html, guess_punct_space=True, guess_layout=False) == text
+
+    text = 'title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5\n\n' \
+           'text_6 text_7 text_8\n\ntext_9\n\n...text_10'
+    assert extract_text(html, guess_punct_space=True, guess_layout=True) == text
 
 
 def test_adjust_newline():
@@ -141,4 +142,4 @@ def test_webpages():
             html = f_in.read()
         with open(extr, 'r', encoding='utf8') as f_in:
             expected = f_in.read()
-        assert extract_text(html, guess_layout=True) == expected
+        assert extract_text(html) == expected

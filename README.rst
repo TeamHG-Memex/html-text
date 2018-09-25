@@ -25,9 +25,10 @@ How is html_text different from ``.xpath('//text()')`` from LXML
 or ``.get_text()`` from Beautiful Soup?
 Text extracted with ``html_text`` does not contain inline styles,
 javascript, comments and other text that is not normally visible to the users.
-It normalizes whitespace, but is also smarter than ``.xpath('normalize-space())``,
-adding spaces around inline elements (which are often used as block
-elements in html markup), tries to avoid adding extra spaces for punctuation and
+It normalizes whitespace, but is also smarter than
+``.xpath('normalize-space())``, adding spaces around inline elements
+(which are often used as block elements in html markup),
+tries to avoid adding extra spaces for punctuation and
 can add newlines so that the output text looks like how it is rendered in
 browsers.
 
@@ -58,10 +59,11 @@ Extract text from HTML::
 
     >>> import html_text
     >>> html_text.extract_text('<h1>Hello</h1> world!')
+    'Hello\n\nworld!'
+
+    >>> html_text.extract_text('<h1>Hello</h1> world!', guess_layout=False)
     'Hello world!'
 
-    >>> html_text.extract_text(u'<h1>Hello</h1> world!', guess_layout=True)
-    'Hello\n\nworld!'
 
 
 You can also pass already parsed ``lxml.html.HtmlElement``:
@@ -69,7 +71,7 @@ You can also pass already parsed ``lxml.html.HtmlElement``:
     >>> import html_text
     >>> tree = html_text.parse_html('<h1>Hello</h1> world!')
     >>> html_text.extract_text(tree)
-    'Hello world!'
+    'Hello\n\nworld!'
 
 Or define a selector to extract text only from specific elements:
 
@@ -87,14 +89,14 @@ NB Selectors are not cleaned automatically you need to call
 Main functions:
 
 * ``html_text.extract_text`` accepts html and returns extracted text.
-* ``html_text.cleaned_selector`` accepts html as text or as ``lxml.html.HtmlElement``,
-  and returns cleaned ``parsel.Selector``.
-* ``html_text.selector_to_text`` accepts ``parsel.Selector`` and returns extracted
-  text.
+* ``html_text.cleaned_selector`` accepts html as text or as
+  ``lxml.html.HtmlElement``, and returns cleaned ``parsel.Selector``.
+* ``html_text.selector_to_text`` accepts ``parsel.Selector`` and returns
+  extracted text.
 
-If ``guess_layout`` is True (False by default for backward compatibility),
-a newline is added before and after ``newline_tags`` and two newlines are added
-before and after ``double_newline_tags``. This heuristic makes the extracted text
+If ``guess_layout`` is True (default), a newline is added before and after
+``newline_tags``, and two newlines are added before and after
+``double_newline_tags``. This heuristic makes the extracted text
 more similar to how it is rendered in the browser. Default newline and double
 newline tags can be found in `html_text.NEWLINE_TAGS`
 and `html_text.DOUBLE_NEWLINE_TAGS`.
@@ -106,7 +108,6 @@ after ``<div>`` tags:
 
     >>> newline_tags = html_text.NEWLINE_TAGS - {'div'}
     >>> html_text.extract_text('<div>Hello</div> world!',
-    ...                        guess_layout=True,
     ...                        newline_tags=newline_tags)
     'Hello world!'
 
