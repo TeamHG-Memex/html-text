@@ -112,7 +112,7 @@ def _html_to_text(tree,
         space = get_space_between(text, context.prev)
         chunks.extend([space, text])
         # XXX: text_content can't be '\n' or '\n\n', because
-        # normalize_whitespace('\n') is empty.
+        # _normalize_whitespace('\n') is empty.
         context.prev = text_content
 
     def traverse_text_fragments(tree, context, handle_tail=True):
