@@ -75,7 +75,7 @@ def _html_to_text(tree,
 
     class Context:
         """ workaround for missing `nonlocal` in Python 2 """
-        prev = '\n\n'
+        prev = '\n\n'  # can be '\n', '\n\n' or content of the previous chunk
 
     def should_add_space(text, prev):  # type: (str, str) -> bool
         """ Return True if extra whitespace should be added before text """
@@ -111,6 +111,8 @@ def _html_to_text(tree,
             return
         space = get_space_between(text, context.prev)
         chunks.extend([space, text])
+        # XXX: text_content can't be '\n' or '\n\n', because
+        # normalize_whitespace('\n') is empty.
         context.prev = text_content
 
     def traverse_text_fragments(tree, context, handle_tail=True):
