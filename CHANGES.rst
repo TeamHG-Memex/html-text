@@ -2,6 +2,20 @@
 History
 =======
 
+0.4.0 TDB
+------------------
+
+This is a backwards-incompatible release: by default html_text functions
+now add newlines after elements, if appropriate, to make the extracted text
+to look more like how it is rendered in a browser.
+
+To turn it off, pass ``guess_layout=False`` option to html_text functions.
+
+* ``guess_layout`` option to to make extracted text look more like how
+  it is rendered in browser.
+* Add tests of layout extraction for real webpages.
+
+
 0.3.0 (2017-10-12)
 ------------------
 

@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; Webstruct 0.6 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="ref/index.html" />
+    <link rel="prev" title="Webstruct" href="intro.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+
+<!-- RTD Extra Head -->
+
+<!-- 
+Always link to the latest version, as canonical.
+http://docs.readthedocs.org/en/latest/canonical.html
+-->
+<link rel="canonical" href="https://webstruct.readthedocs.io/en/latest/tutorial.html" />
+
+<link rel="stylesheet" href="https://media.readthedocs.org/css/readthedocs-doc-embed.css" type="text/css" />
+
+<script type="text/javascript" src="_static/readthedocs-data.js"></script>
+
+<!-- Add page-specific data, which must exist in the page js, not global -->
+<script type="text/javascript">
+READTHEDOCS_DATA['page'] = 'tutorial'
+READTHEDOCS_DATA['source_suffix'] = '.rst'
+</script>
+
+<script type="text/javascript" src="https://media.readthedocs.org/javascript/readthedocs-analytics.js"></script>
+
+<!-- end RTD <extrahead> -->
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Webstruct
+          
+
+          
+          </a>
+
+          
+            
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Webstruct</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#get-annotated-data">Get annotated data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-html-to-tokens">From HTML to Tokens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feature-extraction">Feature Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-a-sequence-labelling-toolkit">Using a Sequence Labelling Toolkit</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#defining-a-model">Defining a Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training">Training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#named-entity-recognition">Named Entity Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#entity-grouping">Entity Grouping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-development">Model Development</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Webstruct</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/scrapinghub/webstruct/blob/master/docs/tutorial.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial assumes you are familiar with machine learning.</p>
+<div class="section" id="get-annotated-data">
+<h2>Get annotated data<a class="headerlink" href="#get-annotated-data" title="Permalink to this headline">¶</a></h2>
+<p>First, you need the training/development data. We suggest to use
+<a class="reference external" href="https://github.com/xtannier/WebAnnotator">WebAnnotator</a> Firefox extension to annotate HTML pages.</p>
+<p>Recommended WebAnnotator options:</p>
+<img alt="_images/wa-options.png" src="_images/wa-options.png" />
+<p>Pro tip - enable WebAnnotator toolbar buttons:</p>
+<img alt="_images/wa-buttons.png" src="_images/wa-buttons.png" />
+<p>Follow WebAnnotator <a class="reference external" href="http://perso.limsi.fr/xtannier/en/WebAnnotator/">manual</a>
+to define named entities and annotate some web pages (nested WebAnnotator
+entities are not supported). Use “Save as..” menu item or “Save as”
+toolbar button to save the results; don’t use “Export as”.</p>
+<p>After that you can load annotated webpages as lxml trees:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">webstruct</span>
+<span class="n">trees</span> <span class="o">=</span> <span class="n">webstruct</span><span class="o">.</span><span class="n">load_trees</span><span class="p">(</span><span class="s2">&quot;train/*.html&quot;</span><span class="p">,</span> <span class="n">webstruct</span><span class="o">.</span><span class="n">WebAnnotatorLoader</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="ref/loaders.html#html-loaders"><span class="std std-ref">HTML Loaders</span></a> for more info.
+<a class="reference external" href="http://gate.ac.uk/">GATE</a> annotation format is also supported.</p>
+</div>
+<div class="section" id="from-html-to-tokens">
+<h2>From HTML to Tokens<a class="headerlink" href="#from-html-to-tokens" title="Permalink to this headline">¶</a></h2>
+<p>To convert HTML trees to a format suitable for sequence prediction algorithm
+(like CRF, MEMM or Structured Perceptron) the following approach is used:</p>
+<ol class="arabic simple">
+<li>Text is extracted from HTML and split into tokens.</li>
+<li>For each token a special <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlToken" title="webstruct.html_tokenizer.HtmlToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlToken</span></code></a> instance is created. It
+contains information not only about the text token itself, but also about
+its position in HTML tree.</li>
+</ol>
+<p>A single HTML page corresponds to a single input sequence
+(a list of HtmlTokens). For training/testing data
+(where webpages are already annotated) there is also a list of labels for
+each webpage, a label per HtmlToken.</p>
+<p>To transform HTML trees into labels and HTML tokens
+use <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlTokenizer" title="webstruct.html_tokenizer.HtmlTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlTokenizer</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">html_tokenizer</span> <span class="o">=</span> <span class="n">webstruct</span><span class="o">.</span><span class="n">HtmlTokenizer</span><span class="p">()</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">html_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Input trees should be loaded by one of the WebStruct loaders.
+For consistency, for each tree (even if it is loaded from raw unannotated html)
+<a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlTokenizer" title="webstruct.html_tokenizer.HtmlTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlTokenizer</span></code></a> extracts two arrays: a list of <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlToken" title="webstruct.html_tokenizer.HtmlToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlToken</span></code></a>
+instances and a list of tags encoded using <a class="reference external" href="http://en.wikipedia.org/wiki/Inside_Outside_Beginning">IOB2</a> encoding
+(also known as BIO encoding). So in our example <code class="docutils literal notranslate"><span class="pre">X</span></code> is a list of
+lists of <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlToken" title="webstruct.html_tokenizer.HtmlToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlToken</span></code></a> instances, and  <code class="docutils literal notranslate"><span class="pre">y</span></code> is a list of lists
+of strings.</p>
+</div>
+<div class="section" id="feature-extraction">
+<h2>Feature Extraction<a class="headerlink" href="#feature-extraction" title="Permalink to this headline">¶</a></h2>
+<p>For supervised machine learning algorithms to work we need to extract
+<a class="reference external" href="http://en.wikipedia.org/wiki/Features_%28pattern_recognition%29">features</a>.</p>
+<p>In WebStruct feature vectors are Python dicts
+<code class="docutils literal notranslate"><span class="pre">{&quot;feature_name&quot;:</span> <span class="pre">&quot;feature_value&quot;}</span></code>; a dict is computed for
+each HTML token. How to convert these dicts into representation required
+by a sequence labelling toolkit depends on a toolkit used; we will cover
+that later.</p>
+<p>To compute feature dicts we’ll use <a class="reference internal" href="ref/features.html#webstruct.feature_extraction.HtmlFeatureExtractor" title="webstruct.feature_extraction.HtmlFeatureExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlFeatureExtractor</span></code></a>.</p>
+<p>First, define your feature functions. A feature function should take
+an <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlToken" title="webstruct.html_tokenizer.HtmlToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlToken</span></code></a> instance and return a feature dict;
+feature dicts from individual feature functions will be merged
+into the final feature dict for a token. Feature functions can ask questions
+about token itself, its neighbours (in the same HTML element),
+its position in HTML.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">WebStruct supports other kind of feature functions that work on multiple
+tokens; we don’t cover them in this tutorial.</p>
+</div>
+<p>There are predefined feature functions in <a class="reference internal" href="ref/features.html#module-webstruct.features" title="webstruct.features"><code class="xref py py-mod docutils literal notranslate"><span class="pre">webstruct.features</span></code></a>,
+but for this tutorial let’s create some functions ourselves:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">token_identity</span><span class="p">(</span><span class="n">html_token</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">html_token</span><span class="o">.</span><span class="n">token</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">token_isupper</span><span class="p">(</span><span class="n">html_token</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;isupper&#39;</span><span class="p">:</span> <span class="n">html_token</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+
+<span class="k">def</span> <span class="nf">parent_tag</span><span class="p">(</span><span class="n">html_token</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;parent_tag&#39;</span><span class="p">:</span> <span class="n">html_token</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">tag</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">border_at_left</span><span class="p">(</span><span class="n">html_token</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;border_at_left&#39;</span><span class="p">:</span> <span class="n">html_token</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, create <a class="reference internal" href="ref/features.html#webstruct.feature_extraction.HtmlFeatureExtractor" title="webstruct.feature_extraction.HtmlFeatureExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlFeatureExtractor</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">HtmlFeatureExtractor</span><span class="p">(</span>
+    <span class="n">token_features</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">token_identity</span><span class="p">,</span>
+        <span class="n">token_isupper</span><span class="p">,</span>
+        <span class="n">parent_tag</span><span class="p">,</span>
+        <span class="n">border_at_left</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>and use it to extract feature dicts:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">features</span> <span class="o">=</span> <span class="n">feature_extractor</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="ref/features.html#feature-extraction"><span class="std std-ref">Feature Extraction</span></a> for more info about HTML tokenization and
+feature extraction.</p>
+</div>
+<div class="section" id="using-a-sequence-labelling-toolkit">
+<h2>Using a Sequence Labelling Toolkit<a class="headerlink" href="#using-a-sequence-labelling-toolkit" title="Permalink to this headline">¶</a></h2>
+<p>WebStruct doesn’t provide a CRF or Structured Perceptron implementation;
+learning and prediction is supposed to be handled by an external
+sequence labelling toolkit like <a class="reference external" href="http://www.chokkan.org/software/crfsuite/">CRFSuite</a>, <a class="reference external" href="http://wapiti.limsi.fr">Wapiti</a> or <a class="reference external" href="https://github.com/larsmans/seqlearn">seqlearn</a>.</p>
+<p>Once feature dicts are extracted from HTML you should convert them to
+a format required by your sequence labelling tooklit and use this toolkit
+to train a model and do the prediction. For example, you may use
+DictVectorizer from scikit-learn to convert feature dicts
+into <a class="reference external" href="https://github.com/larsmans/seqlearn">seqlearn</a> input format.</p>
+<p>We’ll use <a class="reference external" href="http://www.chokkan.org/software/crfsuite/">CRFSuite</a> in this tutorial.</p>
+<p>WebStruct provides some helpers for CRFSuite sequence labelling toolkit.
+To use CRFSuite with WebStruct, you need</p>
+<ul class="simple">
+<li>sklearn-crfsuite package (which depends on python-crfsuite and sklearn)</li>
+</ul>
+<div class="section" id="defining-a-model">
+<h3>Defining a Model<a class="headerlink" href="#defining-a-model" title="Permalink to this headline">¶</a></h3>
+<p>Basic way to define CRF model is the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">webstruct</span><span class="o">.</span><span class="n">create_crfsuite_pipeline</span><span class="p">(</span>
+        <span class="n">token_features</span><span class="o">=</span><span class="p">[</span><span class="n">token_identity</span><span class="p">,</span> <span class="n">token_isupper</span><span class="p">,</span> <span class="n">parent_tag</span><span class="p">,</span> <span class="n">border_at_left</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>First <a class="reference internal" href="ref/crfsuite.html#webstruct.crfsuite.create_crfsuite_pipeline" title="webstruct.crfsuite.create_crfsuite_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_crfsuite_pipeline()</span></code></a> argument is a list of feature functions which will be used for training.
+<code class="docutils literal notranslate"><span class="pre">verbose</span></code> is a boolean parameter enabling verbose output of various training information;
+check sklearn-crfsuite <a class="reference external" href="https://sklearn-crfsuite.readthedocs.io/en/latest/api.html#sklearn_crfsuite.CRF">API reference</a>
+for available options.</p>
+<p>Under the hood <a class="reference internal" href="ref/crfsuite.html#webstruct.crfsuite.create_crfsuite_pipeline" title="webstruct.crfsuite.create_crfsuite_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_crfsuite_pipeline()</span></code></a> creates a
+<code class="docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code> with an <a class="reference internal" href="ref/features.html#webstruct.feature_extraction.HtmlFeatureExtractor" title="webstruct.feature_extraction.HtmlFeatureExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlFeatureExtractor</span></code></a> instance
+followed by <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn_crfsuite.CRF</span></code> instance. The example above is just a shortcut
+for the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;fe&#39;</span><span class="p">,</span> <span class="n">HtmlFeatureExtractor</span><span class="p">(</span>
+        <span class="n">token_features</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">token_identity</span><span class="p">,</span>
+            <span class="n">token_isupper</span><span class="p">,</span>
+            <span class="n">parent_tag</span><span class="p">,</span>
+            <span class="n">border_at_left</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;crf&#39;</span><span class="p">,</span> <span class="n">sklearn_crfsuite</span><span class="o">.</span><span class="n">CRF</span><span class="p">(</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="training">
+<h3>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h3>
+<p>To train a model use its <code class="docutils literal notranslate"><span class="pre">fit</span></code> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> are return values of <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlTokenizer.tokenize" title="webstruct.html_tokenizer.HtmlTokenizer.tokenize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HtmlTokenizer.tokenize()</span></code></a>
+(a list of lists of <a class="reference internal" href="ref/features.html#webstruct.html_tokenizer.HtmlToken" title="webstruct.html_tokenizer.HtmlToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlToken</span></code></a> instances and a list of
+lists of string IOB labels).</p>
+<p>If you use <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn_crfsuite.CRF</span></code> directly then train it using
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">CRF.fit()</span></code> method. It accepts 2 lists: a list of lists of
+feature dicts, and a list of lists of tags:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="named-entity-recognition">
+<h2>Named Entity Recognition<a class="headerlink" href="#named-entity-recognition" title="Permalink to this headline">¶</a></h2>
+<p>Once you got a trained model you can use it to extract entities
+from unseen (unannotated) webpages. First, get some binary HTML data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://scrapinghub.com/contact&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then create a <a class="reference internal" href="ref/model.html#webstruct.model.NER" title="webstruct.model.NER"><code class="xref py py-class docutils literal notranslate"><span class="pre">NER</span></code></a> instance initialized with a trained model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ner</span> <span class="o">=</span> <span class="n">webstruct</span><span class="o">.</span><span class="n">NER</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> must provide a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that extracts features
+from HTML tokens and predicts labels for these tokens. A pipeline created with
+<a class="reference internal" href="ref/crfsuite.html#webstruct.crfsuite.create_crfsuite_pipeline" title="webstruct.crfsuite.create_crfsuite_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_crfsuite_pipeline()</span></code></a> function fits this definition.</p>
+<p>Finally, use <a class="reference internal" href="ref/model.html#webstruct.model.NER.extract" title="webstruct.model.NER.extract"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NER.extract()</span></code></a> method to extract entities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ner</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+<span class="go">[(&#39;Scrapinghub&#39;, &#39;ORG&#39;), ..., (&#39;Iturriaga 3429 ap. 1&#39;, &#39;STREET&#39;), ...]</span>
+</pre></div>
+</div>
+<p>Generally, the steps are:</p>
+<ol class="arabic simple">
+<li>Load data using <a class="reference internal" href="ref/loaders.html#webstruct.loaders.HtmlLoader" title="webstruct.loaders.HtmlLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlLoader</span></code></a> loader. If a custom HTML cleaner
+was used for loading training data make sure to apply it here as well.</li>
+<li>Use the same <code class="docutils literal notranslate"><span class="pre">html_tokenizer</span></code> as used for training to extract HTML tokens
+from loaded trees. All labels would be “O” when using <a class="reference internal" href="ref/loaders.html#webstruct.loaders.HtmlLoader" title="webstruct.loaders.HtmlLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">HtmlLoader</span></code></a>
+loader - <code class="docutils literal notranslate"><span class="pre">y</span></code> can be discarded.</li>
+<li>Use the same <code class="docutils literal notranslate"><span class="pre">feature_extractor</span></code> as used for training to extract
+features.</li>
+<li>Run <code class="docutils literal notranslate"><span class="pre">your_crf.predict()</span></code> method (e.g. <code class="xref py py-meth docutils literal notranslate"><span class="pre">CRF.predict()</span></code>)
+on features extracted in (3) to get the prediction - a list of IOB2-encoded
+tags for each input document.</li>
+<li>Build entities from input tokens based on predicted tags
+(check <a class="reference internal" href="ref/misc.html#webstruct.sequence_encoding.IobEncoder.group" title="webstruct.sequence_encoding.IobEncoder.group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">IobEncoder.group()</span></code></a> and <a class="reference internal" href="ref/misc.html#webstruct.utils.smart_join" title="webstruct.utils.smart_join"><code class="xref py py-func docutils literal notranslate"><span class="pre">smart_join()</span></code></a>).</li>
+<li>Split entities into groups (optional). One way to do it is to use
+<a class="reference internal" href="ref/grouping.html#module-webstruct.grouping" title="webstruct.grouping"><code class="xref py py-mod docutils literal notranslate"><span class="pre">webstruct.grouping</span></code></a>.</li>
+</ol>
+<p><a class="reference internal" href="ref/model.html#webstruct.model.NER" title="webstruct.model.NER"><code class="xref py py-class docutils literal notranslate"><span class="pre">NER</span></code></a> helper class combines HTML loading, HTML tokenization,
+feature extraction, CRF model, entity building and grouping.</p>
+</div>
+<div class="section" id="entity-grouping">
+<h2>Entity Grouping<a class="headerlink" href="#entity-grouping" title="Permalink to this headline">¶</a></h2>
+<p>Detecting entities on their own is not always enough; in many cases
+what is wanted is to find the relationship between them. For example,
+“<strong>street_name/STREET city_name/CITY zipcode_number/ZIPCODE</strong>
+form an address”, or “<strong>phone/TEL</strong> is a phone of <strong>person/PER</strong>”.</p>
+<p>The first approximation is to say that all entities from a single webpage
+are related. For example, if we have extracted some <strong>organizaion/ORG</strong> and some
+<strong>phone/TEL</strong> from a single webpage we may assume that the phone
+is a contact phone of the organization.</p>
+<p>Sometimes there are several “entity groups” on a webpage. If a page
+contains contact phones of several persons or several business locations
+it is better to split all entities into groups of related
+entities - “person name + his/her phone(s)” or “address”.</p>
+<p>WebStruct provides an <a class="reference internal" href="ref/grouping.html#grouping-algorithm"><span class="std std-ref">unsupervised algorithm</span></a>
+for extracting such entity groups. Algorithm prefers to build
+large groups without entities of duplicate types; if a split is needed
+algorithm tries to split at points where distance between entities is larger.</p>
+<p>Use <a class="reference internal" href="ref/model.html#webstruct.model.NER.extract_groups" title="webstruct.model.NER.extract_groups"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NER.extract_groups()</span></code></a> to extract groups of entities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ner</span><span class="o">.</span><span class="n">extract_groups</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+<span class="go">[[...], ... [(&#39;Iturriaga 3429 ap. 1&#39;, &#39;STREET&#39;), (&#39;Montevideo&#39;, &#39;CITY&#39;), ...]]</span>
+</pre></div>
+</div>
+<p>Sometimes it is better to allow some entity types to appear
+multuple times in a group. For example, a person (PER entity) may have
+several contact phones and faxes (TEL and FAX entities) - we should penalize
+groups with multiple PERs, but multiple TELs and FAXes are fine.
+Use <code class="docutils literal notranslate"><span class="pre">dont_penalize</span></code> argument if you want to allow some entity types
+to appear multiple times in a group:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ner</span><span class="o">.</span><span class="n">extract_groups</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">dont_penalize</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;TEL&#39;</span><span class="p">,</span> <span class="s1">&#39;FAX&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The simple algorithm WebStruct provides is by no means a general solution
+to relation detection, but give it a try - maybe it is enough for your task.</p>
+</div>
+<div class="section" id="model-development">
+<h2>Model Development<a class="headerlink" href="#model-development" title="Permalink to this headline">¶</a></h2>
+<p>To develop the model you need to choose the learning algorithm,
+features, hyperparameters, etc. To do that you need scoring metrics,
+cross-validation utilities and tools for debugging what classifier learned.
+WebStruct helps in the following way:</p>
+<ol class="arabic">
+<li><p class="first">Pipeline created by <a class="reference internal" href="ref/crfsuite.html#webstruct.crfsuite.create_crfsuite_pipeline" title="webstruct.crfsuite.create_crfsuite_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_crfsuite_pipeline()</span></code></a> is compatible with
+<a class="reference external" href="http://scikit-learn.org/stable/modules/cross_validation.html">cross-validation</a> and <a class="reference external" href="http://scikit-learn.org/stable/modules/grid_search.html">grid search</a> utilities from scikit-learn;
+use them to select model parameters and check the quality.</p>
+<p>One limitation of <a class="reference internal" href="ref/crfsuite.html#webstruct.crfsuite.create_crfsuite_pipeline" title="webstruct.crfsuite.create_crfsuite_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_crfsuite_pipeline()</span></code></a> is that <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>
+in scikit-learn functions and classes should be 1, but other than that
+WebStruct objects should work fine with scikit-learn. Just keep in mind
+that for WebStruct an “observation” is a document, not an individual token,
+and a “label” is a sequence of labels for a document, not an individual
+IOB tag.</p>
+</li>
+<li><p class="first">There is <a class="reference internal" href="ref/metrics.html#module-webstruct.metrics" title="webstruct.metrics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">webstruct.metrics</span></code></a> module with a couple of metrics useful
+for sequence classification.</p>
+</li>
+</ol>
+<p>To debug what CRFSuite learned you could use <a class="reference external" href="https://github.com/TeamHG-Memex/eli5">eli5</a> library. With eli5 it would be two calls to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">eli5.explain_weights()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">eli5.format_as_html()</span></code> with <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn_crfsuite.CRF</span></code> instance as argument.
+As a result you will get transitions and feature weights.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ref/index.html" class="btn btn-neutral float-right" title="Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="intro.html" class="btn btn-neutral" title="Webstruct" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014-2017, Scrapinghub Inc..
+      
+        <span class="commit">
+          Revision <code>9e461566</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: latest
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <dl>
+        <dt>Versions</dt>
+        
+          <dd><a href="/en/latest/">latest</a></dd>
+        
+          <dd><a href="/en/stable/">stable</a></dd>
+        
+          <dd><a href="/en/0.6/">0.6</a></dd>
+        
+          <dd><a href="/en/0.5/">0.5</a></dd>
+        
+          <dd><a href="/en/0.4.1/">0.4.1</a></dd>
+        
+          <dd><a href="/en/0.4/">0.4</a></dd>
+        
+          <dd><a href="/en/0.3/">0.3</a></dd>
+        
+          <dd><a href="/en/0.2/">0.2</a></dd>
+        
+      </dl>
+      <dl>
+        <dt>Downloads</dt>
+        
+          <dd><a href="//readthedocs.org/projects/webstruct/downloads/pdf/latest/">pdf</a></dd>
+        
+          <dd><a href="//readthedocs.org/projects/webstruct/downloads/htmlzip/latest/">htmlzip</a></dd>
+        
+          <dd><a href="//readthedocs.org/projects/webstruct/downloads/epub/latest/">epub</a></dd>
+        
+      </dl>
+      <dl>
+        <dt>On Read the Docs</dt>
+          <dd>
+            <a href="//readthedocs.org/projects/webstruct/?fromdocs=webstruct">Project Home</a>
+          </dd>
+          <dd>
+            <a href="//readthedocs.org/builds/webstruct/?fromdocs=webstruct">Builds</a>
+          </dd>
+      </dl>
+      <hr/>
+      Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+  </div>
+
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.6',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="https://media.readthedocs.org/javascript/jquery/jquery-2.0.3.min.js"></script>
+      <script type="text/javascript" src="https://media.readthedocs.org/javascript/jquery/jquery-migrate-1.2.1.min.js"></script>
+      <script type="text/javascript" src="https://media.readthedocs.org/javascript/underscore.js"></script>
+      <script type="text/javascript" src="https://media.readthedocs.org/javascript/doctools.js"></script>
+      <script type="text/javascript" src="https://media.readthedocs.org/javascript/readthedocs-doc-embed.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -7,6 +7,16 @@ from lxml.html.clean import Cleaner
 import parsel
 
 
+NEWLINE_TAGS = frozenset([
+    'article', 'aside', 'br', 'dd', 'details', 'div', 'dt', 'fieldset',
+    'figcaption', 'footer', 'form', 'header', 'hr', 'legend', 'li', 'main',
+    'nav', 'table', 'tr'
+])
+DOUBLE_NEWLINE_TAGS = frozenset([
+    'blockquote', 'dl', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol',
+    'p', 'pre', 'title', 'ul'
+])
+
 _clean_html = Cleaner(
     scripts=True,
     javascript=False,  # onclick attributes are fine
@@ -43,31 +53,105 @@ def parse_html(html):
 
 _whitespace = re.compile(r'\s+')
 _has_trailing_whitespace = re.compile(r'\s$').search
-_has_punct_after = re.compile(r'^[,:;.!?"\)]').search
-_has_punct_before = re.compile(r'\($').search
+_has_punct_after = re.compile(r'^[,:;.!?")]').search
+_has_open_bracket_before = re.compile(r'\($').search
 
 
-def selector_to_text(sel, guess_punct_space=True):
-    """ Convert a cleaned selector to text.
-    See html_text.extract_text docstring for description of the approach and options.
+def _normalize_whitespace(text):
+    return _whitespace.sub(' ', text.strip())
+
+
+def _html_to_text(tree,
+                  guess_punct_space=True,
+                  guess_layout=True,
+                  newline_tags=NEWLINE_TAGS,
+                  double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
-    if guess_punct_space:
+    Convert a cleaned html tree to text.
+    See html_text.extract_text docstring for description of the approach
+    and options.
+    """
+    chunks = []
 
-        def fragments():
-            prev = None
-            for text in sel.xpath('.//text()').extract():
-                if prev is not None and (_has_trailing_whitespace(prev)
-                                         or (not _has_punct_after(text) and
-                                             not _has_punct_before(prev))):
-                    yield ' '
-                yield text
-                prev = text
+    _NEWLINE = object()
+    _DOUBLE_NEWLINE = object()
 
-        return _whitespace.sub(' ', ''.join(fragments()).strip())
+    class Context:
+        """ workaround for missing `nonlocal` in Python 2 """
+        # _NEWLINE, _DOUBLE_NEWLINE or content of the previous chunk (str)
+        prev = _DOUBLE_NEWLINE
 
+    def should_add_space(text, prev):
+        """ Return True if extra whitespace should be added before text """
+        if prev in {_NEWLINE, _DOUBLE_NEWLINE}:
+            return False
+        if not _has_trailing_whitespace(prev):
+            if _has_punct_after(text) or _has_open_bracket_before(prev):
+                return False
+        return True
+
+    def get_space_between(text, prev):
+        if not text or not guess_punct_space:
+            return ' '
+        return ' ' if should_add_space(text, prev) else ''
+
+    def add_newlines(tag, context):
+        if not guess_layout:
+            return
+        prev = context.prev
+        if prev is _DOUBLE_NEWLINE:  # don't output more than 1 blank line
+            return
+        if tag in double_newline_tags:
+            context.prev = _DOUBLE_NEWLINE
+            chunks.append('\n' if prev is _NEWLINE else '\n\n')
+        elif tag in newline_tags:
+            context.prev = _NEWLINE
+            if prev is not _NEWLINE:
+                chunks.append('\n')
+
+    def add_text(text_content, context):
+        text = _normalize_whitespace(text_content) if text_content else ''
+        if not text:
+            return
+        space = get_space_between(text, context.prev)
+        chunks.extend([space, text])
+        context.prev = text_content
+
+    def traverse_text_fragments(tree, context, handle_tail=True):
+        """ Extract text from the ``tree``: fill ``chunks`` variable """
+        add_newlines(tree.tag, context)
+        add_text(tree.text, context)
+        for child in tree:
+            traverse_text_fragments(child, context)
+        add_newlines(tree.tag, context)
+        if handle_tail:
+            add_text(tree.tail, context)
+
+    traverse_text_fragments(tree, context=Context(), handle_tail=False)
+    return ''.join(chunks).strip()
+
+
+def selector_to_text(sel, guess_punct_space=True, guess_layout=True):
+    """ Convert a cleaned selector to text.
+    See html_text.extract_text docstring for description of the approach
+    and options.
+    """
+    if isinstance(sel, parsel.SelectorList):
+        # if selecting a specific xpath
+        text = []
+        for s in sel:
+            extracted = _html_to_text(
+                s.root,
+                guess_punct_space=guess_punct_space,
+                guess_layout=guess_layout)
+            if extracted:
+                text.append(extracted)
+        return ' '.join(text)
     else:
-        fragments = (x.strip() for x in sel.xpath('.//text()').extract())
-        return _whitespace.sub(' ', ' '.join(x for x in fragments if x))
+        return _html_to_text(
+            sel.root,
+            guess_punct_space=guess_punct_space,
+            guess_layout=guess_layout)
 
 
 def cleaned_selector(html):
@@ -85,18 +169,40 @@ def cleaned_selector(html):
     return sel
 
 
-def extract_text(html, guess_punct_space=True):
+def extract_text(html,
+                 guess_punct_space=True,
+                 guess_layout=True,
+                 newline_tags=NEWLINE_TAGS,
+                 double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
     Convert html to text, cleaning invisible content such as styles.
+
     Almost the same as normalize-space xpath, but this also
     adds spaces between inline elements (like <span>) which are
-    often used as block elements in html markup.
+    often used as block elements in html markup, and adds appropriate
+    newlines to make output better formatted.
+
+    html should be a unicode string or an already parsed lxml.html element.
 
     When guess_punct_space is True (default), no extra whitespace is added
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
 
-    html should be a unicode string or an already parsed lxml.html element.
+    When guess_layout is True (default), a newline is added
+    before and after ``newline_tags`` and two newlines are added before
+    and after ``double_newline_tags``. This heuristic makes the extracted
+    text more similar to how it is rendered in the browser.
+
+    Default newline and double newline tags can be found in
+    `html_text.NEWLINE_TAGS` and `html_text.DOUBLE_NEWLINE_TAGS`.
     """
-    sel = cleaned_selector(html)
-    return selector_to_text(sel, guess_punct_space=guess_punct_space)
+    if html is None or len(html) == 0:
+        return ''
+    cleaned = _cleaned_html_tree(html)
+    return _html_to_text(
+        cleaned,
+        guess_punct_space=guess_punct_space,
+        guess_layout=guess_layout,
+        newline_tags=newline_tags,
+        double_newline_tags=double_newline_tags,
+    )
