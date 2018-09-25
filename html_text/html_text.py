@@ -5,6 +5,7 @@ import lxml
 import lxml.etree
 from lxml.html.clean import Cleaner
 import parsel
+from parsel.selector import create_root_node
 
 
 NEWLINE_TAGS = frozenset([
@@ -39,16 +40,14 @@ def _cleaned_html_tree(html):
     if isinstance(html, lxml.html.HtmlElement):
         tree = html
     else:
-        parser = lxml.html.HTMLParser(encoding='utf8')
-        tree = lxml.html.fromstring(html.encode('utf8'), parser=parser)
+        tree = parse_html(html)
     return _clean_html(tree)
 
 
 def parse_html(html):
     """ Create an lxml.html.HtmlElement from a string with html.
     """
-    parser = lxml.html.HTMLParser(encoding='utf8')
-    return lxml.html.fromstring(html.encode('utf8'), parser=parser)
+    return create_root_node(html, lxml.html.HTMLParser)
 
 
 _whitespace = re.compile(r'\s+')
@@ -196,7 +195,7 @@ def extract_text(html,
     Default newline and double newline tags can be found in
     `html_text.NEWLINE_TAGS` and `html_text.DOUBLE_NEWLINE_TAGS`.
     """
-    if html is None or len(html) == 0:
+    if html is None:
         return ''
     cleaned = _cleaned_html_tree(html)
     return _html_to_text(

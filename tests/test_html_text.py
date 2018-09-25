@@ -38,6 +38,8 @@ def test_declared_encoding(all_options):
 
 def test_empty(all_options):
     assert extract_text(u'', **all_options) == ''
+    assert extract_text(u' ', **all_options) == ''
+    assert extract_text(None, **all_options) == ''
 
 
 def test_extract_text_from_tree(all_options):
@@ -45,6 +47,14 @@ def test_extract_text_from_tree(all_options):
             '<body><p>Hello,   world!</body></html>')
     tree = parse_html(html)
     assert extract_text(tree, **all_options) == u'Hello, world!'
+
+
+def test_extract_text_from_node(all_options):
+    html = (u'<html><style>.div {}</style>'
+            '<body><p>Hello,   world!</p></body></html>')
+    tree = parse_html(html)
+    node = tree.xpath('//p')[0]
+    assert extract_text(node, **all_options) == u'Hello, world!'
 
 
 def test_inline_tags_whitespace(all_options):
@@ -79,16 +89,21 @@ def test_bad_punct_whitespace():
     assert text == u'trees = webstruct.load_trees("train/*.html")'
 
 
-def test_selector(all_options):
+def test_selectors(all_options):
     html = (u'<span><span id="extract-me">text<a>more</a>'
             '</span>and more text <a> and some more</a> <a></a> </span>')
+    # Selector
     sel = cleaned_selector(html)
     assert selector_to_text(sel, **all_options) == 'text more and more text and some more'
+
+    # SelectorList
     subsel = sel.xpath('//span[@id="extract-me"]')
     assert selector_to_text(subsel, **all_options) == 'text more'
     subsel = sel.xpath('//a')
     assert selector_to_text(subsel, **all_options) == 'more and some more'
     subsel = sel.xpath('//a[@id="extract-me"]')
+    assert selector_to_text(subsel, **all_options) == ''
+    subsel = sel.xpath('//foo')
     assert selector_to_text(subsel, **all_options) == ''
 
 
