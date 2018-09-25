@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.0 TDB
+0.4.0 (2018-09-25)
 ------------------
 
 This is a backwards-incompatible release: by default html_text functions
