@@ -2,6 +2,13 @@
 History
 =======
 
+0.4.1 (2018-09-25)
+------------------
+
+Fixed a regression in 0.4.0 release: text was empty when
+``html_text.extract_text`` is called with a node with text, but
+without children.
+
 0.4.0 (2018-09-25)
 ------------------
 
