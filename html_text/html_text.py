@@ -4,8 +4,6 @@ import re
 import lxml
 import lxml.etree
 from lxml.html.clean import Cleaner
-import parsel
-from parsel.selector import create_root_node
 
 
 NEWLINE_TAGS = frozenset([
@@ -18,7 +16,7 @@ DOUBLE_NEWLINE_TAGS = frozenset([
     'p', 'pre', 'title', 'ul'
 ])
 
-_clean_html = Cleaner(
+cleaner = Cleaner(
     scripts=True,
     javascript=False,  # onclick attributes are fine
     comments=True,
@@ -33,7 +31,7 @@ _clean_html = Cleaner(
     annoying_tags=False,
     remove_unknown_tags=False,
     safe_attrs_only=False,
-).clean_html
+)
 
 
 def _cleaned_html_tree(html):
@@ -41,13 +39,19 @@ def _cleaned_html_tree(html):
         tree = html
     else:
         tree = parse_html(html)
-    return _clean_html(tree)
+    return cleaner.clean_html(tree)
 
 
 def parse_html(html):
     """ Create an lxml.html.HtmlElement from a string with html.
+    XXX: mostly copy-pasted from parsel.selector.create_root_node
     """
-    return create_root_node(html, lxml.html.HTMLParser)
+    body = html.strip().replace('\x00', '').encode('utf8') or b'<html/>'
+    parser = lxml.html.HTMLParser(recover=True, encoding='utf8')
+    root = lxml.etree.fromstring(body, parser=parser)
+    if root is None:
+        root = lxml.etree.fromstring(b'<html/>', parser=parser)
+    return root
 
 
 _whitespace = re.compile(r'\s+')
@@ -60,15 +64,18 @@ def _normalize_whitespace(text):
     return _whitespace.sub(' ', text.strip())
 
 
-def _html_to_text(tree,
+def etree_to_text(tree,
                   guess_punct_space=True,
                   guess_layout=True,
                   newline_tags=NEWLINE_TAGS,
                   double_newline_tags=DOUBLE_NEWLINE_TAGS):
     """
-    Convert a cleaned html tree to text.
-    See html_text.extract_text docstring for description of the approach
-    and options.
+    Convert a html tree to text. Tree should be cleaned with
+    ``html_text.html_text.cleaner.clean_html`` before passing to this
+    function.
+
+    See html_text.extract_text docstring for description of the
+    approach and options.
     """
     chunks = []
 
@@ -135,11 +142,12 @@ def selector_to_text(sel, guess_punct_space=True, guess_layout=True):
     See html_text.extract_text docstring for description of the approach
     and options.
     """
+    import parsel
     if isinstance(sel, parsel.SelectorList):
         # if selecting a specific xpath
         text = []
         for s in sel:
-            extracted = _html_to_text(
+            extracted = etree_to_text(
                 s.root,
                 guess_punct_space=guess_punct_space,
                 guess_layout=guess_layout)
@@ -147,15 +155,16 @@ def selector_to_text(sel, guess_punct_space=True, guess_layout=True):
                 text.append(extracted)
         return ' '.join(text)
     else:
-        return _html_to_text(
+        return etree_to_text(
             sel.root,
             guess_punct_space=guess_punct_space,
             guess_layout=guess_layout)
 
 
 def cleaned_selector(html):
-    """ Clean selector.
+    """ Clean parsel.selector.
     """
+    import parsel
     try:
         tree = _cleaned_html_tree(html)
         sel = parsel.Selector(root=tree, type='html')
@@ -183,6 +192,9 @@ def extract_text(html,
 
     html should be a unicode string or an already parsed lxml.html element.
 
+    ``html_text.etree_to_text`` is a lower-level function which only accepts
+    an already parsed lxml.html Element, and is not doing html cleaning itself.
+
     When guess_punct_space is True (default), no extra whitespace is added
     for punctuation. This has a slight (around 10%) performance overhead
     and is just a heuristic.
@@ -198,7 +210,7 @@ def extract_text(html,
     if html is None:
         return ''
     cleaned = _cleaned_html_tree(html)
-    return _html_to_text(
+    return etree_to_text(
         cleaned,
         guess_punct_space=guess_punct_space,
         guess_layout=guess_layout,

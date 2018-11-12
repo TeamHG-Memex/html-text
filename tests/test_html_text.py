@@ -6,7 +6,8 @@ import six
 import pytest
 
 from html_text import (extract_text, parse_html, cleaned_selector,
-                       selector_to_text, NEWLINE_TAGS, DOUBLE_NEWLINE_TAGS)
+                       etree_to_text, cleaner, selector_to_text, NEWLINE_TAGS,
+                       DOUBLE_NEWLINE_TAGS)
 
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -184,3 +185,6 @@ def test_webpages(page, extracted):
         html = html.replace('&nbsp;', ' ')
     expected = _load_file(extracted)
     assert extract_text(html) == expected
+
+    tree = cleaner.clean_html(parse_html(html))
+    assert etree_to_text(tree) == expected
