@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 import pytest
 import glob
+import os
 
 from html_text import (extract_text, parse_html, cleaned_selector,
                        selector_to_text, NEWLINE_TAGS, DOUBLE_NEWLINE_TAGS)
+
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.fixture(params=[
@@ -149,12 +153,16 @@ def test_personalize_newlines_sets():
     assert text == 'text\n\nmore\n\nand more text\n\nand some more'
 
 
-def test_webpages():
-    webpages = sorted(glob.glob('./test_webpages/*.html'))
-    extracted = sorted(glob.glob('./test_webpages/*.txt'))
-    for page, extr in zip(webpages, extracted):
-        with open(page, 'r', encoding='utf8') as f_in:
-            html = f_in.read()
-        with open(extr, 'r', encoding='utf8') as f_in:
-            expected = f_in.read()
-        assert extract_text(html) == expected
+def _load_examples():
+    webpages = sorted(glob.glob(os.path.join(ROOT, 'test_webpages', '*.html')))
+    extracted = sorted(glob.glob(os.path.join(ROOT, 'test_webpages','*.txt')))
+    return list(zip(webpages, extracted))
+
+
+@pytest.mark.parametrize(['page', 'extracted'], _load_examples())
+def test_foo(page, extracted):
+    with open(page, 'r', encoding='utf8') as f_in:
+        html = f_in.read()
+    with open(extracted, 'r', encoding='utf8') as f_in:
+        expected = f_in.read()
+    assert extract_text(html) == expected
