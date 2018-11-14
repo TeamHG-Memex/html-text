@@ -49,6 +49,10 @@ def test_empty(all_options):
     assert extract_text(None, **all_options) == ''
 
 
+def test_comment(all_options):
+    assert extract_text(u"<!-- hello world -->", **all_options) == ''
+
+
 def test_extract_text_from_tree(all_options):
     html = (u'<html><style>.div {}</style>'
             '<body><p>Hello,   world!</body></html>')
