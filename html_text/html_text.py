@@ -138,7 +138,7 @@ def etree_to_text(tree,
 
 
 def selector_to_text(sel, guess_punct_space=True, guess_layout=True):
-    """ Convert a cleaned selector to text.
+    """ Convert a cleaned parsel.Selector to text.
     See html_text.extract_text docstring for description of the approach
     and options.
     """
