@@ -101,6 +101,7 @@ def test_bad_punct_whitespace():
 
 
 def test_selectors(all_options):
+    pytest.importorskip("parsel")
     html = (u'<span><span id="extract-me">text<a>more</a>'
             '</span>and more text <a> and some more</a> <a></a> </span>')
     # Selector
