@@ -175,7 +175,7 @@ def _load_file(path):
 
 
 @pytest.mark.parametrize(['page', 'extracted'], _webpage_paths())
-def test_foo(page, extracted):
+def test_webpages(page, extracted):
     html = _load_file(page)
     if not six.PY3:
         # FIXME: &nbsp; produces '\xa0' in Python 2, but ' ' in Python 3
