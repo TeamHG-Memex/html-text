@@ -9,14 +9,6 @@ with open('README.rst') as readme_file:
 with open('CHANGES.rst') as history_file:
     history = history_file.read()
 
-requirements = [
-    'lxml',
-    'parsel',
-]
-
-test_requirements = [
-    'pytest',
-]
 
 setup(
     name='html_text',
@@ -28,7 +20,7 @@ setup(
     url='https://github.com/TeamHG-Memex/html-text',
     packages=['html_text'],
     include_package_data=True,
-    install_requires=requirements,
+    install_requires=['lxml'],
     license="MIT license",
     zip_safe=False,
     classifiers=[
@@ -44,5 +36,5 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    tests_require=['pytest'],
 )
