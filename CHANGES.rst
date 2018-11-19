@@ -2,6 +2,20 @@
 History
 =======
 
+0.5.0 (2018-11-19)
+------------------
+
+Parsel dependency is removed in this release,
+though parsel is still supported.
+
+* ``parsel`` package is no longer required to install and use html-text;
+* ``html_text.etree_to_text`` function allows to extract text from
+  lxml Elements;
+* ``html_text.cleaner`` is an ``lxml.html.clean.Cleaner`` instance with
+  options tuned for text extraction speed and quality;
+* test and documentation improvements;
+* Python 3.7 support.
+
 0.4.1 (2018-09-25)
 ------------------
 
