@@ -138,8 +138,8 @@ def test_guess_layout():
            'text_8 text_9 ...text_10'
     assert extract_text(html, guess_punct_space=False, guess_layout=False) == text
 
-    text = ('title\n\n text_1.\n\n text_2 text_3\n\n text_4\n text_5'
-            '\n\n text_6 text_7 text_8\n\n text_9\n\n ...text_10')
+    text = ('title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5'
+            '\n\ntext_6 text_7 text_8\n\ntext_9\n\n...text_10')
     assert extract_text(html, guess_punct_space=False, guess_layout=True) == text
 
     text = 'title text_1. text_2 text_3 text_4 text_5 text_6 text_7 ' \
@@ -149,6 +149,14 @@ def test_guess_layout():
     text = 'title\n\ntext_1.\n\ntext_2 text_3\n\ntext_4\ntext_5\n\n' \
            'text_6 text_7 text_8\n\ntext_9\n\n...text_10'
     assert extract_text(html, guess_punct_space=True, guess_layout=True) == text
+
+
+def test_basic_newline():
+    html = u'<div>a</div><div>b</div>'
+    assert extract_text(html, guess_punct_space=False, guess_layout=False) == 'a b'
+    assert extract_text(html, guess_punct_space=False, guess_layout=True) == 'a\nb'
+    assert extract_text(html, guess_punct_space=True, guess_layout=False) == 'a b'
+    assert extract_text(html, guess_punct_space=True, guess_layout=True) == 'a\nb'
 
 
 def test_adjust_newline():
