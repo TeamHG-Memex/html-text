@@ -91,13 +91,15 @@ def etree_to_text(tree,
         """ Return True if extra whitespace should be added before text """
         if prev in {_NEWLINE, _DOUBLE_NEWLINE}:
             return False
+        if not guess_punct_space:
+            return True
         if not _has_trailing_whitespace(prev):
             if _has_punct_after(text) or _has_open_bracket_before(prev):
                 return False
         return True
 
     def get_space_between(text, prev):
-        if not text or not guess_punct_space:
+        if not text:
             return ' '
         return ' ' if should_add_space(text, prev) else ''
 
