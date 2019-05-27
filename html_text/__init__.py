@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 from .html_text import (etree_to_text, extract_text, selector_to_text,
                         parse_html, cleaned_selector, cleaner,
