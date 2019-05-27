@@ -2,6 +2,12 @@
 History
 =======
 
+0.5.1 (2019-05-27)
+------------------
+
+Fixed whitespace handling when ``guess_punct_space`` is False: html-text was
+producing unnecessary spaces after newlines.
+
 0.5.0 (2018-11-19)
 ------------------
 
