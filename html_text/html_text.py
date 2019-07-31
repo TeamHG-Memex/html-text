@@ -43,7 +43,7 @@ def _cleaned_html_tree(html):
     try:
         cleaned = cleaner.clean_html(tree)
     except Exception:
-        cleaned = lxml.html.Element('html')
+        cleaned = tree
 
     return cleaned
 
