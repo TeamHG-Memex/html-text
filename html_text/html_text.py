@@ -39,7 +39,13 @@ def _cleaned_html_tree(html):
         tree = html
     else:
         tree = parse_html(html)
-    return cleaner.clean_html(tree)
+
+    try:
+        cleaned = cleaner.clean_html(tree)
+    except Exception:
+        cleaned = lxml.html.Element('html')
+
+    return cleaned
 
 
 def parse_html(html):
