@@ -40,6 +40,7 @@ def _cleaned_html_tree(html):
     else:
         tree = parse_html(html)
 
+    # we need this as https://bugs.launchpad.net/lxml/+bug/1838497
     try:
         cleaned = cleaner.clean_html(tree)
     except Exception:
