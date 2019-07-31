@@ -43,7 +43,7 @@ def _cleaned_html_tree(html):
     # we need this as https://bugs.launchpad.net/lxml/+bug/1838497
     try:
         cleaned = cleaner.clean_html(tree)
-    except Exception:
+    except AssertionError:
         cleaned = tree
 
     return cleaned
