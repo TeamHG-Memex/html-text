@@ -39,7 +39,14 @@ def _cleaned_html_tree(html):
         tree = html
     else:
         tree = parse_html(html)
-    return cleaner.clean_html(tree)
+
+    # we need this as https://bugs.launchpad.net/lxml/+bug/1838497
+    try:
+        cleaned = cleaner.clean_html(tree)
+    except AssertionError:
+        cleaned = tree
+
+    return cleaned
 
 
 def parse_html(html):

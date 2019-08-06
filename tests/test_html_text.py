@@ -73,6 +73,13 @@ def test_inline_tags_whitespace(all_options):
     assert extract_text(html, **all_options) == u'field value of'
 
 
+def test_extract_text_from_fail_html():
+    html = "<html><frameset><frame></frameset></html>"
+    tree = parse_html(html)
+    node = tree.xpath('/html/frameset')[0]
+    assert extract_text(node) == u''
+
+
 def test_punct_whitespace():
     html = u'<div><span>field</span>, and more</div>'
     assert extract_text(html, guess_punct_space=False) == u'field , and more'
