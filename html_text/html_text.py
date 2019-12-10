@@ -75,7 +75,8 @@ def etree_to_text(tree,
                   guess_punct_space=True,
                   guess_layout=True,
                   newline_tags=NEWLINE_TAGS,
-                  double_newline_tags=DOUBLE_NEWLINE_TAGS):
+                  double_newline_tags=DOUBLE_NEWLINE_TAGS,
+                  extract_alt_text=False):
     """
     Convert a html tree to text. Tree should be cleaned with
     ``html_text.html_text.cleaner.clean_html`` before passing to this
@@ -135,6 +136,10 @@ def etree_to_text(tree,
     def traverse_text_fragments(tree, context, handle_tail=True):
         """ Extract text from the ``tree``: fill ``chunks`` variable """
         add_newlines(tree.tag, context)
+        if extract_alt_text is True:
+            alt_text = tree.attrib.get('alt')
+            if alt_text is not None:
+                add_text(alt_text, context)
         add_text(tree.text, context)
         for child in tree:
             traverse_text_fragments(child, context)
@@ -190,7 +195,8 @@ def extract_text(html,
                  guess_punct_space=True,
                  guess_layout=True,
                  newline_tags=NEWLINE_TAGS,
-                 double_newline_tags=DOUBLE_NEWLINE_TAGS):
+                 double_newline_tags=DOUBLE_NEWLINE_TAGS,
+                 extract_alt_text=False):
     """
     Convert html to text, cleaning invisible content such as styles.
 
@@ -215,6 +221,10 @@ def extract_text(html,
 
     Default newline and double newline tags can be found in
     `html_text.NEWLINE_TAGS` and `html_text.DOUBLE_NEWLINE_TAGS`.
+
+    By default, alternative text associated to ``img``, ``area`` and ``input``
+    tags is ignored. Set *extract_alt_text* to ``True`` to extract that text
+    as well.
     """
     if html is None:
         return ''
@@ -225,4 +235,5 @@ def extract_text(html,
         guess_layout=guess_layout,
         newline_tags=newline_tags,
         double_newline_tags=double_newline_tags,
+        extract_alt_text=extract_alt_text,
     )
