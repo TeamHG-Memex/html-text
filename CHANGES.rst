@@ -2,6 +2,14 @@
 History
 =======
 
+0.5.2 (2020-07-22)
+------------------
+
+* Handle lxml Cleaner exceptions (a workaround for
+  https://bugs.launchpad.net/lxml/+bug/1838497 );
+* Python 3.8 support;
+* testing improvements.
+
 0.5.1 (2019-05-27)
 ------------------
 
