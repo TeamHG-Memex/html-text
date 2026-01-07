@@ -1,0 +1,5 @@
+./setup.py
+./tests/test_html_text.py
+./tests/__init__.py
+./html_text/__init__.py
+./html_text/html_text.py
