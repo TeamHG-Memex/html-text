@@ -34,3 +34,13 @@ after_success:
 cache:
     directories:
         - $HOME/.cache/pip
+
+deploy:
+    provider: pypi
+    user: "…"
+    password:
+        secure: "…"
+    distributions: "sdist bdist_wheel"
+    skip_existing: true
+    on:
+        tags: true
