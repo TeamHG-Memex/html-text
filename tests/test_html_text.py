@@ -208,3 +208,34 @@ def test_webpages(page, extracted):
 
     tree = cleaner.clean_html(parse_html(html))
     assert etree_to_text(tree) == expected
+
+
+def test_alt_text_disabled():
+    html = (u'<img alt="In the sky flies a red flag with a white cross whose '
+            u'vertical bar is shifted toward the flagpole."'
+            u'src="http://upload.a.org/wikipedia/commons/thumb/8/83'
+            u'/Dannebrog.jpg/180px-Dannebrog.jpg">')
+    text = extract_text(html)
+    assert text == u''
+
+
+def test_alt_text_enabled():
+    html = (u'<img alt="In the sky flies a red flag with a white cross whose '
+            u'vertical bar is shifted toward the flagpole."'
+            u'src="http://upload.a.org/wikipedia/commons/thumb/8/83'
+            u'/Dannebrog.jpg/180px-Dannebrog.jpg">')
+    text = extract_text(html, extract_alt_text=True)
+    assert text == (u'In the sky flies a red flag with a white cross whose '
+                    u'vertical bar is shifted toward the flagpole.')
+
+
+def test_alt_text_between_paragraphs_disabled():
+    html = (u'<p>1</p><img alt="2" /><p>3</p>')
+    text = extract_text(html)
+    assert text == u'1\n\n3'
+
+
+def test_alt_text_between_paragraphs_enabled():
+    html = (u'<p>1</p><img alt="2" /><p>3</p>')
+    text = extract_text(html, extract_alt_text=True)
+    assert text == u'1\n\n2\n\n3'
